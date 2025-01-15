@@ -9,12 +9,12 @@ const AuthLayout = ({ children }) => {
       className="min-h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: `url('/img/background.webp')` }}
     >
-      <div className="flex w-full max-w-[900px] bg-black/20 backdrop-blur-sm rounded-lg shadow-2xl overflow-hidden">
-        <div className="w-1/2 p-8 flex items-center justify-center bg-black/40">
+      <div className="flex w-full max-w-[900px] bg-[#00000080] backdrop-blur-sm border border-[#707070] rounded-lg shadow-2xl overflow-hidden">
+        <div className="w-1/2 p-8 flex items-center justify-center border border-[#707070] bg-[#00000066]">
           <Image
             src="/img/logo.webp"
             alt="Logo"
-            width={120}
+            width={150}
             height={120}
             className="w-32 h-32"
           />
