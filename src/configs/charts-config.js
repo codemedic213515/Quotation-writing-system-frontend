@@ -21,7 +21,7 @@ export const chartsConfig = {
       style: {
         colors: "#37474f",
         fontSize: "13px",
-        fontFamily: "inherit",
+        fontFamily: "Noto Sans JP",
         fontWeight: 300,
       },
     },
@@ -31,7 +31,7 @@ export const chartsConfig = {
       style: {
         colors: "#37474f",
         fontSize: "13px",
-        fontFamily: "inherit",
+        fontFamily: "Noto Sans JP",
         fontWeight: 300,
       },
     },
