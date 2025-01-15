@@ -1,4 +1,8 @@
 import {
+  FolderPlusIcon,
+  PencilSquareIcon,
+  CalculatorIcon,
+  PrinterIcon,
   HomeIcon,
   UserCircleIcon,
   TableCellsIcon,
@@ -7,6 +11,7 @@ import {
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
+import {CreateQuotation} from "@/pages/createQuotation"
 import { SignIn, SignUp } from "@/pages/auth";
 
 const icon = {
@@ -14,9 +19,33 @@ const icon = {
 };
 
 export const routes = [
-  {
+  {title: "基本作業",
     layout: "dashboard",
     pages: [
+      {
+        icon:<FolderPlusIcon {...icon}/>,
+        name: "明細書作成",
+        path: "/createquotation",
+        element: <CreateQuotation />,
+      },
+      {
+        icon:<PencilSquareIcon {...icon}/>,
+        name: "明細書修正",
+        path: "/home",
+        element: <Home />,
+      },
+      {
+        icon:<CalculatorIcon {...icon}/>,
+        name: "明細集計処理",
+        path: "/home",
+        element: <Home />,
+      },
+      {
+        icon:<PrinterIcon {...icon}/>,
+        name: "見積書発行",
+        path: "/home",
+        element: <Home />,
+      },
       {
         icon: <HomeIcon {...icon} />,
         name: "dashboard",

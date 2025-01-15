@@ -1,29 +1,64 @@
-import React from 'react';
-import {Image} from 'antd';
+import React, { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
+// Set API Base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+axios.defaults.baseURL = API_BASE_URL;
 
-// AuthLayout Component
-const AuthLayout = ({ children }) => {
-  return (
-    <div 
-      className="min-h-screen flex items-center justify-center bg-cover bg-center"
-      style={{ backgroundImage: `url('/img/background.webp')` }}
-    >
-      <div className="flex w-full max-w-[900px] bg-[#00000080] backdrop-blur-sm border border-[#707070] rounded-lg shadow-2xl overflow-hidden">
-        <div className="w-1/2 p-8 flex items-center justify-center border border-[#707070] bg-[#00000066]">
-          <Image
-            src="/img/logo.webp"
-            alt="Logo"
-            width={150}
-            height={120}
-            className="w-32 h-32"
-          />
-        </div>
-        <div className="w-1/2 bg-white/10 backdrop-blur-md p-8 rounded-r-lg">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
+// Create the context
+export const AuthContext = createContext();
+
+// Define the provider
+export const AuthProvider = ({children }) => {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        }
+        setLoading(false);
+    }, []);
+
+    // Login function
+    const login = async (email, password) => {
+        try {
+            const response = await axios.post('/api/auth/login', { email, password });
+            const { token } = response.data;
+            localStorage.setItem('token', token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            setUser({ email });
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error;
+        }
+    };
+
+    // Register function
+    const register = async (email, password, code, name) => {
+        try {
+            await axios.post('/api/auth/register', { email, password, code, name });
+        } catch (error) {
+            console.error('Registration failed:', error);
+            throw error;
+        }
+    };
+
+    // Logout function
+    const logout = () => {
+        localStorage.removeItem('token');
+        delete axios.defaults.headers.common['Authorization'];
+        setUser(null);
+    };
+
+    // Render component
+    return (
+      <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+        {children}
+     </AuthContext.Provider>
+    );
 };
-export default AuthLayout;
+
+// Default export
+export default AuthProvider;
