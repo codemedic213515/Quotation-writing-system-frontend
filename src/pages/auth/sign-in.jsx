@@ -128,7 +128,7 @@
 import React from 'react';
 import { Form, Input, Checkbox, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import AuthLayout from '../../widgets/layout/auth-layout'
+import AuthLayout from '@/widgets/layout/auth-layout'
 // Login Page Component
 export function SignIn() {
   const navigate = useNavigate();
@@ -146,7 +146,7 @@ export function SignIn() {
     <AuthLayout>
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Login</h1>
+          <h1 className="text-2xl font-bold text-white">ログイン</h1>
         </div>
 
         <Form
@@ -157,24 +157,24 @@ export function SignIn() {
           className="space-y-4"
         >
           <Form.Item
-            label={<span className="text-white">User ID</span>}
+            label={<span className="text-white">ユーザー ID</span>}
             name="userId"
             rules={[{ required: true, message: 'Please input your User ID!' }]}
           >
-            <Input className="bg-white/20 border-white/30 text-white placeholder-white/50" />
+            <Input className="bg-white/20 text-black" />
           </Form.Item>
 
           <Form.Item
-            label={<span className="text-white">Password</span>}
+            label={<span className="text-white">パスワード</span>}
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
-            <Input.Password className="bg-white/20 border-white/30 text-white placeholder-white/50" />
+            <Input.Password className="bg-white/20 border-white/30 text-white" />
           </Form.Item>
 
           <Form.Item>
             <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox className="text-white">Remember login status</Checkbox>
+              <Checkbox className="text-white">ログイン状態を保存する</Checkbox>
             </Form.Item>
           </Form.Item>
 
@@ -183,13 +183,13 @@ export function SignIn() {
               type="submit"
               className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
-              Login
+              ログイン
             </button>
             <button
-              onClick={() => navigate('/auth/signup')}
-              className="flex-1 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors text-center"
+              onClick={() => navigate('/auth/sign-up')}
+              className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors text-center"
             >
-              Register
+              新規登録
             </button>
           </div>
         </Form>
