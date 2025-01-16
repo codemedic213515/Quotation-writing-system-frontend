@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Form, Input, Radio, Select, Button } from 'antd';
+import {
+  Typography,
+  Form,
+  Input,
+  Radio,
+  Select,
+  Button,
+  FloatButton,
+} from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
-const BasicInput = () => {
+const BasicInput = ({ setActiveTab }) => {
   const [selectedValue, setSelectedValue] = useState('0');
   const [selected, setSelected] = useState('');
   const [selectedRadio, setSelectedRadio] = useState('');
@@ -213,14 +221,14 @@ const BasicInput = () => {
                 </div>
               </Radio.Group>
             </Form.Item>
-            <Form.Item className="flex justify-end">
+            {/* <Form.Item className="flex justify-end">
               <Button
                 type="submit"
                 className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
               >
-                作成
+                次へ
               </Button>
-            </Form.Item>
+            </Form.Item> */}
           </div>
         </div>
       </Form>
@@ -462,6 +470,12 @@ const BasicInput = () => {
           </Form.Item>
         </div>
       </Form>
+      <FloatButton
+        shape="square"
+        type="primary"
+        description="次へ"
+        className="mb-16 mr-10 animate-bounce"
+      />
     </div>
   );
 };
