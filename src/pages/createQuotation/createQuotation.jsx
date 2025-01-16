@@ -96,9 +96,13 @@ export function CreateQuotation() {
           </div>
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
-            {activeTab === 'basic' && <BasicInput />}
-            {activeTab === 'addition' && <AdditionalInput />}
-            {activeTab === 'step' && <StepInput />}
+            {activeTab === 'basic' && (
+              <BasicInput setActiveTab={setActiveTab} />
+            )}
+            {activeTab === 'addition' && (
+              <AdditionalInput setActiveTab={setActiveTab} />
+            )}
+            {activeTab === 'step' && <StepInput setActiveTab={setActiveTab} />}
             {activeTab === 'material' && <MaterialInput />}
           </div>
         </CardBody>
