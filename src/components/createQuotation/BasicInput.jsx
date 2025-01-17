@@ -221,14 +221,6 @@ const BasicInput = ({ setActiveTab }) => {
                 </div>
               </Radio.Group>
             </Form.Item>
-            {/* <Form.Item className="flex justify-end">
-              <Button
-                type="submit"
-                className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-              >
-                次へ
-              </Button>
-            </Form.Item> */}
           </div>
         </div>
       </Form>
@@ -467,6 +459,14 @@ const BasicInput = ({ setActiveTab }) => {
                 { value: 'ワ', label: 'ワ' },
               ]}
             />
+          </Form.Item>
+          <Form.Item className="flex justify-end">
+            <Button
+              type="submit"
+              className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              保管
+            </Button>
           </Form.Item>
         </div>
       </Form>

@@ -10,7 +10,7 @@ import {
 import routes from '@/routes';
 import { useMaterialTailwindController, setOpenConfigurator } from '@/context';
 
-export function Dashboard() {
+export function Main() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
@@ -35,7 +35,7 @@ export function Dashboard() {
         <Routes>
           {routes.map(
             ({ layout, pages }) =>
-              layout === 'dashboard' &&
+              layout === 'main' &&
               pages.map(({ path, element }) => (
                 <Route exact path={path} element={element} />
               )),
@@ -49,6 +49,6 @@ export function Dashboard() {
   );
 }
 
-Dashboard.displayName = '/src/layout/dashboard.jsx';
+Main.displayName = '/src/layout/main.jsx';
 
-export default Dashboard;
+export default Main;
