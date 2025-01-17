@@ -17,7 +17,6 @@ import {
   Calculation,
   Print,
 } from '@/pages/main';
-import { SignIn, SignUp } from '@/pages/auth';
 
 const icon = {
   className: 'w-5 h-5 text-inherit',

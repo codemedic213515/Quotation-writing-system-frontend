@@ -132,7 +132,7 @@ const StepInput = ({ setActiveTab }) => {
                 );
               } catch (error) {
                 console.error('Error rendering tree:', error);
-                return <Text type="danger">Failed to render tree</Text>;
+                return <p type="danger">Failed to render tree</p>;
               }
             }}
           </Form.Item>

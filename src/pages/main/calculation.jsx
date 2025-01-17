@@ -6,19 +6,21 @@ import {
   TabsHeader,
   Tab,
 } from '@material-tailwind/react';
+
 import {
-  DocumentTextIcon,
-  SquaresPlusIcon,
-  ArrowPathRoundedSquareIcon,
-  CubeTransparentIcon,
-} from '@heroicons/react/24/solid';
+  CalculatorOutlined,
+  UserOutlined,
+  TagsOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
+
 import SetInput from '@/components/calculation/SetInput';
 import RankInput from '@/components/calculation/RankInput';
 import PriceInput from '@/components/calculation/PriceInput';
 import MaterialInput from '@/components/calculation/MaterialInput';
 import OtherInput from '@/components/calculation/OtherInput';
 
-import { Link } from 'react-router-dom';
 export function Calculation() {
   const [activeTab, setActiveTab] = useState('set');
   return (
@@ -54,7 +56,7 @@ export function Calculation() {
                         : 'text-blue-gray-500 font-bold'
                     } w-auto px-4`}
                   >
-                    <DocumentTextIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    <CalculatorOutlined className="items-center mr-2 h-5 w-5" />
                     数量
                   </Tab>
                   <Tab
@@ -66,7 +68,7 @@ export function Calculation() {
                         : 'font-bold text-blue-gray-500'
                     } w-auto px-4`}
                   >
-                    <SquaresPlusIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
+                    <UserOutlined className="items-center mr-2 h-5 w-5" />
                     ランク
                   </Tab>
                   <Tab
@@ -78,7 +80,7 @@ export function Calculation() {
                         : 'font-bold text-blue-gray-500'
                     } w-auto px-4`}
                   >
-                    <ArrowPathRoundedSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    <TagsOutlined className="items-center mr-2 h-5 w-5" />
                     部材単価
                   </Tab>
                   <Tab
@@ -90,7 +92,7 @@ export function Calculation() {
                         : 'font-bold text-blue-gray-500'
                     } w-auto px-4`}
                   >
-                    <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    <BarChartOutlined className="items-center mr-2 h-5 w-5" />
                     材料消費率
                   </Tab>
                   <Tab
@@ -102,7 +104,7 @@ export function Calculation() {
                         : 'font-bold text-blue-gray-500'
                     } w-auto px-4`}
                   >
-                    <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    <SettingOutlined className="items-center mr-2 h-5 w-5" />
                     その他計算設定
                   </Tab>
                 </TabsHeader>
