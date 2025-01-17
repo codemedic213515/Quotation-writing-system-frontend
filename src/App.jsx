@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Auth, Main } from '@/layouts';
+import { Auth, Main, Dashboard } from '@/layouts';
 
 function App() {
   return (
@@ -10,6 +10,7 @@ function App() {
         path="*"
         element={<Navigate to="/main/createquotation" replace />}
       />
+      <Route path="/dashboard/*" element={<Dashboard />} />
     </Routes>
   );
 }

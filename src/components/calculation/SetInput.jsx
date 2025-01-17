@@ -1,4 +1,4 @@
-import { Form, Input, Table } from 'antd';
+import { FloatButton, InputNumber, Table } from 'antd';
 
 export function SetInput() {
   const columns = [
@@ -14,14 +14,18 @@ export function SetInput() {
       dataIndex: 'netRate',
       key: 'netRate',
       align: 'center',
-      render: () => <Input type="number" className="w-20" placeholder="%" />,
+      render: () => (
+        <InputNumber max={100} min={0} className="w-24" addonAfter="%" />
+      ),
     },
     {
       title: '補給率',
       dataIndex: 'replenishmentRate',
       key: 'replenishmentRate',
       align: 'center',
-      render: () => <Input type="number" className="w-20" placeholder="%" />,
+      render: () => (
+        <InputNumber max={100} min={0} className="w-24" addonAfter="%" />
+      ),
     },
   ];
 
@@ -43,13 +47,19 @@ export function SetInput() {
         dataSource={data}
         pagination={false}
         bordered
-        className="border-collapse w-auto h-auto m-auto"
+        className="border-collapse w-auto h-auto mb-20 mx-auto"
       />
       <p>
         ※
         実Net率･･･拾い出した数量にすでに補給率が含まれている場合に補正することができます。
       </p>
       <p>※補給率…提出時の数量に余分目な量を含めることができます。</p>
+      <FloatButton
+        shape="square"
+        type="primary"
+        description="次へ"
+        className="mb-16 mr-10 animate-bounce"
+      />
     </div>
   );
 }

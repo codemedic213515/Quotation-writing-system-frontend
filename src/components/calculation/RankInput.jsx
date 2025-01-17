@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Table, Input, Button, Select, Space } from 'antd';
+import {
+  Table,
+  Input,
+  InputNumber,
+  Button,
+  Select,
+  FloatButton,
+  Radio,
+  Form,
+} from 'antd';
 
 const { Option } = Select;
 export function RankInput() {
@@ -78,10 +87,10 @@ export function RankInput() {
         <Input
           value={record.laborRateA}
           addonAfter={'円'}
+          min={0}
           onChange={(e) =>
             handleInputChange(record.key, 'laborRateA', e.target.value)
           }
-          type="number"
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -96,10 +105,10 @@ export function RankInput() {
         <Input
           value={record.laborRateB}
           addonAfter={'円'}
+          min={0}
           onChange={(e) =>
             handleInputChange(record.key, 'laborRateB', e.target.value)
           }
-          type="number"
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -111,13 +120,12 @@ export function RankInput() {
       key: 'fieldRate',
       align: 'center',
       render: (text, record) => (
-        <Input
+        <InputNumber
           value={record.fieldRate}
-          addonAfter={'%'}
-          onChange={(e) =>
-            handleInputChange(record.key, 'fieldRate', e.target.value)
-          }
-          type="number"
+          addonAfter="%"
+          min={0}
+          max={100}
+          onChange={(e) => handleInputChange(record.key, 'fieldRate', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -129,13 +137,12 @@ export function RankInput() {
       key: 'miscRate',
       align: 'center',
       render: (text, record) => (
-        <Input
-          addonAfter={'%'}
+        <InputNumber
+          addonAfter="%"
+          min={0}
+          max={100}
           value={record.miscRate}
-          onChange={(e) =>
-            handleInputChange(record.key, 'miscRate', e.target.value)
-          }
-          type="number"
+          onChange={(e) => handleInputChange(record.key, 'miscRate', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -153,28 +160,51 @@ export function RankInput() {
   };
 
   return (
-    <div className="p-5 font-sans">
-      <Table
-        columns={columns}
-        dataSource={data}
-        pagination={false}
-        bordered
-        className="mb-4 border-collapse"
-        rowClassName={(record) =>
-          record.key === selectedRowKey ? 'bg-blue-100' : ''
-        }
-        onRow={(record) => ({
-          onClick: () => handleRowSelect(record),
-        })}
-      />
-
-      <Button
-        onClick={handleUpdate}
+    <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
+      <p>
+        下記の一覧からランクを設定するか、下記のテキストボックスにて直接入力することができます。
+      </p>
+      <p>※後から自由に変更が可能です。</p>
+      <Form>
+        <Form.Item>
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            bordered
+            className="mb-4 border-collapse"
+            rowClassName={(record) =>
+              record.key === selectedRowKey ? 'bg-blue-100' : ''
+            }
+            onRow={(record) => ({
+              onClick: () => handleRowSelect(record),
+            })}
+          />
+        </Form.Item>
+        <div className="flex flex-row gap-4 items-center justify-center">
+          <Form.Item>
+            <Button
+              onClick={handleUpdate}
+              type="primary"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
+            >
+              更新内容を更新する (Update)
+            </Button>
+          </Form.Item>
+          <Form.Item label="労務費の端数を">
+            <Radio.Group defaultValue={false}>
+              <Radio value={false}>切り捨てる。</Radio>
+              <Radio value={true}>雑材消耗に加算する。</Radio>
+            </Radio.Group>
+          </Form.Item>
+        </div>
+      </Form>
+      <FloatButton
+        shape="square"
         type="primary"
-        className="bg-blue-500 hover:bg-blue-600 text-white"
-      >
-        更新内容を更新する (Update)
-      </Button>
+        description="次へ"
+        className="mb-16 mr-10 animate-bounce"
+      />
     </div>
   );
 }
