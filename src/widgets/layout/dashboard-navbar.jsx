@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link } from 'react-router-dom';
 import {
   Navbar,
   Typography,
@@ -11,7 +11,7 @@ import {
   MenuList,
   MenuItem,
   Avatar,
-} from "@material-tailwind/react";
+} from '@material-tailwind/react';
 import {
   UserCircleIcon,
   Cog6ToothIcon,
@@ -19,26 +19,26 @@ import {
   ClockIcon,
   CreditCardIcon,
   Bars3Icon,
-} from "@heroicons/react/24/solid";
+} from '@heroicons/react/24/solid';
 import {
   useMaterialTailwindController,
   setOpenConfigurator,
   setOpenSidenav,
-} from "@/context";
+} from '@/context';
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
-  const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const [layout, page] = pathname.split('/').filter((el) => el !== '');
 
   return (
     <Navbar
-      color={fixedNavbar ? "white" : "transparent"}
+      color={fixedNavbar ? 'white' : 'transparent'}
       className={`rounded-xl transition-all ${
         fixedNavbar
-          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
-          : "px-0 py-1"
+          ? 'sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5'
+          : 'px-0 py-1'
       }`}
       fullWidth
       blurred={fixedNavbar}
@@ -47,7 +47,7 @@ export function DashboardNavbar() {
         <div className="capitalize">
           <Breadcrumbs
             className={`bg-transparent p-0 transition-all ${
-              fixedNavbar ? "mt-1" : ""
+              fixedNavbar ? 'mt-1' : ''
             }`}
           >
             <Link to={`/${layout}`}>
@@ -191,6 +191,6 @@ export function DashboardNavbar() {
   );
 }
 
-DashboardNavbar.displayName = "/src/widgets/layout/dashboard-navbar.jsx";
+DashboardNavbar.displayName = '/src/widgets/layout/dashboard-navbar.jsx';
 
 export default DashboardNavbar;

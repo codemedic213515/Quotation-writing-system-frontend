@@ -12,13 +12,13 @@ import {
   ArrowPathRoundedSquareIcon,
   CubeTransparentIcon,
 } from '@heroicons/react/24/solid';
-import BasicInput from './BasicInput';
-import AdditionalInput from './AdditionalInput';
-import StepInput from './StepInput';
-import MaterialInput from './MaterialInput';
+import BasicInput from '@/components/editQuotation/BasicInput';
+import AdditionalInput from '@/components/editQuotation/AdditionalInput';
+import StepInput from '@/components/editQuotation/StepInput';
+import MaterialInput from '@/components/editQuotation/MaterialInput';
 
 import { Link } from 'react-router-dom';
-export function CreateQuotation() {
+export function EditQuotation() {
   const [activeTab, setActiveTab] = useState('basic');
   return (
     <div>
@@ -28,6 +28,7 @@ export function CreateQuotation() {
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4">
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
+            <></>
             <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
               {activeTab === 'basic'
                 ? '基本入力'
@@ -111,4 +112,4 @@ export function CreateQuotation() {
   );
 }
 
-export default CreateQuotation;
+export default EditQuotation;

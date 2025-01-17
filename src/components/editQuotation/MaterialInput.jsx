@@ -4,21 +4,6 @@ import { Button, Card, Form, Space, Select, FloatButton, Input } from 'antd';
 
 const MaterialInput = () => {
   const [form] = Form.useForm();
-  // const renderTreeData = (data) => {
-  //   if (!data || !data.items) return [];
-
-  //   return data.items.map((item, itemIndex) => ({
-  //     title: `基本工種 ${itemIndex + 1}: ${item?.['基本工種'] || '未設定'}`,
-  //     key: `item-${itemIndex}-base`,
-  //     children: (item?.['部分工種'] || []).map((subItem, subIndex) => ({
-  //       title: `部分工種1: ${subItem?.['部分工種1'] || '未設定'}, 部分工種2: ${
-  //         subItem?.['部分工種2'] || '未設定'
-  //       }`,
-  //       key: `item-${itemIndex}-part-${subIndex}`,
-  //     })),
-  //   }));
-  // };
-
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-hidden font-bold flex">
       <Form
