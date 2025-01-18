@@ -1,4 +1,4 @@
-import { Form, InputNumber, Radio, FloatButton } from 'antd';
+import { Form, InputNumber, Radio, FloatButton, Modal } from 'antd';
 export function OtherInput() {
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
@@ -176,6 +176,7 @@ export function OtherInput() {
         description="保管"
         className="mb-16 mr-10 animate-bounce"
       />
+      <Modal></Modal>
     </div>
   );
 }

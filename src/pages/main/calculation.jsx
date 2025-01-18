@@ -14,15 +14,16 @@ import {
   BarChartOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-
+import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import SetInput from '@/components/calculation/SetInput';
 import RankInput from '@/components/calculation/RankInput';
 import PriceInput from '@/components/calculation/PriceInput';
 import MaterialInput from '@/components/calculation/MaterialInput';
 import OtherInput from '@/components/calculation/OtherInput';
+import SelectQuotation from '@/components/calculation/SelectQuotation';
 
 export function Calculation() {
-  const [activeTab, setActiveTab] = useState('set');
+  const [activeTab, setActiveTab] = useState('select');
   return (
     <div>
       <div className="relative mt-8 h-28 w-full overflow-hidden rounded-xl ">
@@ -32,7 +33,9 @@ export function Calculation() {
         <CardBody className="p-4">
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
-              {activeTab === 'set'
+              {activeTab === `select`
+                ? '明細書選択'
+                : activeTab === 'set'
                 ? '数量 (Net補給率)'
                 : activeTab === 'rank'
                 ? 'ランク（労務単価・現場雑費率・諸経費率)'
@@ -47,6 +50,18 @@ export function Calculation() {
             <div>
               <Tabs value={activeTab}>
                 <TabsHeader>
+                  <Tab
+                    value="select"
+                    onClick={() => setActiveTab('select')}
+                    className={`${
+                      activeTab === 'select'
+                        ? 'active-tab font-bold text-[#00B3F4]'
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
+                  >
+                    <DocumentMagnifyingGlassIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    明細書選択
+                  </Tab>
                   <Tab
                     value="set"
                     onClick={() => setActiveTab('set')}
@@ -113,6 +128,9 @@ export function Calculation() {
           </div>
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
+            {activeTab === 'select' && (
+              <SelectQuotation setActiveTab={setActiveTab} />
+            )}
             {activeTab === 'set' && <SetInput setActiveTab={setActiveTab} />}
             {activeTab === 'rank' && <RankInput setActiveTab={setActiveTab} />}
             {activeTab === 'price' && (

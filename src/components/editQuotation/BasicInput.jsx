@@ -1,16 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Typography,
-  Form,
-  Input,
-  Radio,
-  Select,
-  Button,
-  FloatButton,
-  DatePicker,
-  Table,
-} from 'antd';
-import TextArea from 'antd/es/input/TextArea';
+import { Form, Input, Radio, Select, FloatButton, DatePicker } from 'antd';
 import CTable from '../CTable';
 
 const BasicInput = ({ setActiveTab }) => {
@@ -38,35 +27,6 @@ const BasicInput = ({ setActiveTab }) => {
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
-      <Form.Item label="Choose ">
-        <div className="flex flex-row justify-between gap-4">
-          <Select
-            showSearch
-            allowClear
-            placeholder="Number"
-            className="w-1/4"
-          />
-          <DatePicker
-            showSearch
-            allowClear
-            placeholder="date"
-            className="w-1/4"
-          />
-          <Select
-            showSearch
-            allowClear
-            placeholder="Work Name"
-            className="w-1/4"
-          />
-          <Select
-            showSearch
-            allowClear
-            placeholder="user name"
-            className="w-1/4"
-          />
-        </div>
-      </Form.Item>
-      <CTable />
       <Form
         layout="vertical"
         className=" border border-t-0 border-x-0 border-b-[#000000b8]"
