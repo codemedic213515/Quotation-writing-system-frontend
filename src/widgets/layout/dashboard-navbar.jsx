@@ -20,11 +20,7 @@ import {
   CreditCardIcon,
   Bars3Icon,
 } from '@heroicons/react/24/solid';
-import {
-  useMaterialTailwindController,
-  setOpenConfigurator,
-  setOpenSidenav,
-} from '@/context';
+import { useMaterialTailwindController, setOpenSidenav } from '@/context';
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -178,13 +174,6 @@ export function DashboardNavbar() {
               </MenuItem>
             </MenuList>
           </Menu>
-          <IconButton
-            variant="text"
-            color="blue-gray"
-            onClick={() => setOpenConfigurator(dispatch, true)}
-          >
-            <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
-          </IconButton>
         </div>
       </div>
     </Navbar>

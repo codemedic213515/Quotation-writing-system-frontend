@@ -32,7 +32,7 @@ const CTable = (props) => {
         dataSource={data}
         sticky
         pagination={false}
-        style={{ width: '100%', height: 160 }}
+        style={{ width: '100%', height: '100%' }}
         tableLayout="fixed"
         rowClassName={(record) =>
           record?.delete === true || record?.選択 === true ? 'bg-base-300' : ''

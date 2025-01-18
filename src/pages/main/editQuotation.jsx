@@ -11,14 +11,16 @@ import {
   SquaresPlusIcon,
   ArrowPathRoundedSquareIcon,
   CubeTransparentIcon,
+  DocumentMagnifyingGlassIcon,
 } from '@heroicons/react/24/solid';
 import BasicInput from '@/components/editQuotation/BasicInput';
 import AdditionalInput from '@/components/editQuotation/AdditionalInput';
 import StepInput from '@/components/editQuotation/StepInput';
 import MaterialInput from '@/components/editQuotation/MaterialInput';
+import SelectQuotation from '@/components/editQuotation/SelectQuotation';
 
 export function EditQuotation() {
-  const [activeTab, setActiveTab] = useState('basic');
+  const [activeTab, setActiveTab] = useState('select');
   return (
     <div>
       <div className="relative mt-8 h-28 w-full overflow-hidden rounded-xl ">
@@ -27,9 +29,10 @@ export function EditQuotation() {
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4">
           <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
-            <></>
             <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
-              {activeTab === 'basic'
+              {activeTab === `select`
+                ? '明細書選択'
+                : activeTab === 'basic'
                 ? '基本入力'
                 : activeTab === 'addition'
                 ? '詳細入力'
@@ -43,13 +46,25 @@ export function EditQuotation() {
               <Tabs value={activeTab}>
                 <TabsHeader>
                   <Tab
+                    value="select"
+                    onClick={() => setActiveTab('select')}
+                    className={`${
+                      activeTab === 'select'
+                        ? 'active-tab font-bold text-[#00B3F4]'
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
+                  >
+                    <DocumentMagnifyingGlassIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    明細書選択
+                  </Tab>
+                  <Tab
                     value="basic"
                     onClick={() => setActiveTab('basic')}
-                    className={
+                    className={`${
                       activeTab === 'basic'
                         ? 'active-tab font-bold text-[#00B3F4]'
                         : 'text-blue-gray-500 font-bold'
-                    }
+                    } w-auto `}
                   >
                     <DocumentTextIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                     基本入力
@@ -57,11 +72,11 @@ export function EditQuotation() {
                   <Tab
                     value="addition"
                     onClick={() => setActiveTab('addition')}
-                    className={
+                    className={`${
                       activeTab === 'addition'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
                     <SquaresPlusIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
                     詳細入力
@@ -69,11 +84,11 @@ export function EditQuotation() {
                   <Tab
                     value="step"
                     onClick={() => setActiveTab('step')}
-                    className={
+                    className={`${
                       activeTab === 'step'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
                     <ArrowPathRoundedSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                     工種入力
@@ -81,11 +96,11 @@ export function EditQuotation() {
                   <Tab
                     value="material"
                     onClick={() => setActiveTab('material')}
-                    className={
+                    className={`${
                       activeTab === 'material'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
                     <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                     部材入力
@@ -96,6 +111,9 @@ export function EditQuotation() {
           </div>
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
+            {activeTab === 'select' && (
+              <SelectQuotation setActiveTab={setActiveTab} />
+            )}
             {activeTab === 'basic' && (
               <BasicInput setActiveTab={setActiveTab} />
             )}

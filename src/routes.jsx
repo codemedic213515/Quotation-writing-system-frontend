@@ -5,12 +5,9 @@ import {
   PrinterIcon,
   HomeIcon,
   UserCircleIcon,
-  TableCellsIcon,
   InformationCircleIcon,
-  ServerStackIcon,
-  RectangleStackIcon,
 } from '@heroicons/react/24/solid';
-import { Home, Profile, Tables, Notifications } from '@/pages/dashboard';
+// import { Home, Profile, Notifications } from '@/pages/dashboard';
 import {
   CreateQuotation,
   EditQuotation,
@@ -23,6 +20,30 @@ const icon = {
 };
 
 export const routes = [
+  // {
+  //   title: 'Dashboard',
+  //   layout: 'dashboard',
+  //   pages: [
+  //     {
+  //       icon: <HomeIcon {...icon} />,
+  //       name: 'dashboard',
+  //       path: '/home',
+  //       element: <Home />,
+  //     },
+  //     {
+  //       icon: <UserCircleIcon {...icon} />,
+  //       name: 'profile',
+  //       path: '/profile',
+  //       element: <Profile />,
+  //     },
+  //     {
+  //       icon: <InformationCircleIcon {...icon} />,
+  //       name: 'notifications',
+  //       path: '/notifications',
+  //       element: <Notifications />,
+  //     },
+  //   ],
+  // },
   {
     title: '基本作業',
     layout: 'main',
@@ -48,38 +69,8 @@ export const routes = [
       {
         icon: <PrinterIcon {...icon} />,
         name: '見積書発行',
-        path: '/home',
+        path: '/print',
         element: <Print />,
-      },
-    ],
-  },
-  {
-    title: 'Dashboard',
-    layout: 'dashboard',
-    pages: [
-      {
-        icon: <HomeIcon {...icon} />,
-        name: 'dashboard',
-        path: '/home',
-        element: <Home />,
-      },
-      {
-        icon: <UserCircleIcon {...icon} />,
-        name: 'profile',
-        path: '/profile',
-        element: <Profile />,
-      },
-      {
-        icon: <TableCellsIcon {...icon} />,
-        name: 'tables',
-        path: '/tables',
-        element: <Tables />,
-      },
-      {
-        icon: <InformationCircleIcon {...icon} />,
-        name: 'notifications',
-        path: '/notifications',
-        element: <Notifications />,
       },
     ],
   },

@@ -12,7 +12,7 @@ export function SignIn() {
     try {
       await login(values.name, values.password);
       message.success('Login successful!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       message.error('Login failed!');
     }
@@ -49,7 +49,7 @@ export function SignIn() {
                 className="space-y-4"
               >
                 <Form.Item
-                  label={<span className="text-white">ユーザー ID</span>}
+                  label={<span className="text-white">名前</span>}
                   name="name"
                   rules={[
                     { required: true, message: 'Please input your User ID!' },
