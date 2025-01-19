@@ -9,6 +9,7 @@ import {
   FloatButton,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
+import axios from 'axios';
 
 const BasicInput = ({ setActiveTab }) => {
   const [selectedValue, setSelectedValue] = useState('0');
