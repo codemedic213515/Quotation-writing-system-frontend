@@ -1,26 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  CardBody,
-  Tabs,
-  TabsHeader,
-  Tab,
-} from '@material-tailwind/react';
-
-import {
-  CalculatorOutlined,
-  UserOutlined,
-  TagsOutlined,
-  BarChartOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
-import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import SetInput from '@/components/calculation/SetInput';
-import RankInput from '@/components/calculation/RankInput';
-import PriceInput from '@/components/calculation/PriceInput';
-import MaterialInput from '@/components/calculation/MaterialInput';
-import OtherInput from '@/components/calculation/OtherInput';
-import SelectQuotation from '@/components/calculation/SelectQuotation';
+import { Card, CardBody } from '@material-tailwind/react';
 
 export function Print() {
   const [activeTab, setActiveTab] = useState('select');
