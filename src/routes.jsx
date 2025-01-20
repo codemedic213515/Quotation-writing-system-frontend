@@ -3,17 +3,17 @@ import {
   PencilSquareIcon,
   CalculatorIcon,
   PrinterIcon,
-  HomeIcon,
-  UserCircleIcon,
-  InformationCircleIcon,
+  ServerStackIcon,
+  PuzzlePieceIcon,
+  AtSymbolIcon,
 } from '@heroicons/react/24/solid';
-// import { Home, Profile, Notifications } from '@/pages/dashboard';
 import {
   CreateQuotation,
   EditQuotation,
   Calculation,
   Print,
 } from '@/pages/main';
+import { MainInfo, Material, Others } from '@/pages/master';
 
 const icon = {
   className: 'w-5 h-5 text-inherit',
@@ -47,6 +47,30 @@ export const routes = [
         name: '見積書発行',
         path: '/print',
         element: <Print />,
+      },
+    ],
+  },
+  {
+    title: 'マスターデータ',
+    layout: 'master',
+    pages: [
+      {
+        icon: <ServerStackIcon {...icon} />,
+        name: '基本情報',
+        path: '/maininfo',
+        element: <MainInfo />,
+      },
+      {
+        icon: <PuzzlePieceIcon {...icon} />,
+        name: '部材情報',
+        path: '/material',
+        element: <Material />,
+      },
+      {
+        icon: <AtSymbolIcon {...icon} />,
+        name: 'その他の情報',
+        path: '/others',
+        element: <Others />,
       },
     ],
   },

@@ -31,7 +31,7 @@ export function Print() {
       </div>
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4">
-          <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
+          {/* <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
               {activeTab === `select`
                 ? '明細書選択'
@@ -125,10 +125,10 @@ export function Print() {
                 </TabsHeader>
               </Tabs>
             </div>
-          </div>
-          {/* Render Content Based on Active Tab */}
+          </div> */}
+
           <div className="tab-content">
-            {activeTab === 'select' && (
+            {/* {activeTab === 'select' && (
               <SelectQuotation setActiveTab={setActiveTab} />
             )}
             {activeTab === 'set' && <SetInput setActiveTab={setActiveTab} />}
@@ -139,7 +139,8 @@ export function Print() {
             {activeTab === 'material' && (
               <MaterialInput setActiveTab={setActiveTab} />
             )}
-            {activeTab === 'other' && <OtherInput />}
+            {activeTab === 'other' && <OtherInput />} */}
+            <p className="h-full w-full">Please check your connection...</p>
           </div>
         </CardBody>
       </Card>

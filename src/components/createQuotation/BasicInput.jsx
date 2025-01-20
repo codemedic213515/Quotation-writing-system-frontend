@@ -7,20 +7,63 @@ import {
   Select,
   Button,
   FloatButton,
+  message,
 } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import axios from 'axios';
 
 const BasicInput = ({ setActiveTab }) => {
+  const [name, setName] = useState('');
+  const [prefectures, setPrefectures] = useState([]);
+  const [cities, setCities] = useState([]);
   const [selectedValue, setSelectedValue] = useState('0');
   const [selected, setSelected] = useState('');
   const [selectedRadio, setSelectedRadio] = useState('');
-  const [name, setName] = useState('');
   const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    fetchPrefectures();
+  }, []);
+
+  const fetchPrefectures = async () => {
+    try {
+      const response = await axios.get('/api/prefecture');
+      const filteredPrefectures = response.data
+        .filter((item) => !item.delete)
+        .map((item) => ({
+          value: item.name,
+          label: item.name,
+        }));
+      setPrefectures(filteredPrefectures);
+    } catch (error) {
+      console.error('Error fetching prefectures:', error);
+      message.error('Failed to fetch prefectures');
+    }
+  };
+
+  const handlePrefectureChange = async (prefecture) => {
+    try {
+      console.log(prefecture);
+
+      const response = await axios.get(`/api/address?city=${prefecture}`);
+
+      const filteredCities = response.data
+        .filter((item) => !item.delete)
+        .map((item) => ({
+          value: item.city,
+          label: item.city,
+        }));
+      setCities(filteredCities);
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      message.error('Failed to fetch cities');
+    }
+  };
 
   const handleRadioChange = (e) => {
     setSelectedValue(e.target.value);
   };
+
   const radioChange = (e) => {
     setSelectedRadio(e.target.value);
   };
@@ -38,7 +81,7 @@ const BasicInput = ({ setActiveTab }) => {
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
       <Form
         layout="vertical"
-        className=" border border-t-0 border-x-0 border-b-[#000000b8]"
+        className="border border-t-0 border-x-0 border-b-[#000000b8]"
       >
         <div className="flex flex-col md:flex-row gap-4">
           <div className="w-full md:w-1/2">
@@ -57,44 +100,35 @@ const BasicInput = ({ setActiveTab }) => {
                 value={selectedValue}
                 className="flex flex-col gap-4"
               >
-                {/* Option 1: 都道府県選択 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="1" style={{ width: 150 }}>
                     都道府県 :
                   </Radio>
                   <div className="flex flex-grow items-center gap-2 justify-start">
                     <Select
-                      suffixIcon
                       placeholder="県"
                       className="w-full"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      disabled={selectedValue !== '1'}
                       allowClear
-                      options={[
-                        { value: 'Tokyo', label: 'Tokyo' },
-                        { value: 'Osaka', label: 'Osaka' },
-                      ]}
+                      onChange={handlePrefectureChange}
+                      options={prefectures}
                     />
                     <Select
-                      suffixIcon
                       placeholder="都市"
                       className="w-full"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      disabled={selectedValue !== '1'}
                       allowClear
-                      options={[
-                        { value: 'Shibuya', label: 'Shibuya' },
-                        { value: 'Namba', label: 'Namba' },
-                      ]}
+                      options={cities}
                     />
                     <Input
                       placeholder="Other location"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      disabled={selectedValue !== '1'}
                       allowClear
                       className="w-full"
                     />
                   </div>
                 </div>
 
-                {/* Option 2: 直接入力 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="2" style={{ width: 150 }}>
                     直接入力 :
@@ -103,7 +137,7 @@ const BasicInput = ({ setActiveTab }) => {
                     <Input
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      disabled={selectedValue && selectedValue !== '2'}
+                      disabled={selectedValue !== '2'}
                       placeholder="Enter location directly"
                       allowClear
                       className="w-full"
@@ -111,7 +145,6 @@ const BasicInput = ({ setActiveTab }) => {
                   </div>
                 </div>
 
-                {/* Option 3: 郵便番号検索 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="3" style={{ width: 150 }}>
                     郵便番号検索 :
@@ -119,10 +152,9 @@ const BasicInput = ({ setActiveTab }) => {
                   <div className="flex-grow">
                     <Select
                       showSearch
-                      suffixIcon
                       value={selected}
                       placeholder="Search by postal code"
-                      disabled={selectedValue && selectedValue !== '3'}
+                      disabled={selectedValue !== '3'}
                       optionFilterProp="label"
                       onChange={handleSelectChange}
                       onSearch={handleSelectSearch}
