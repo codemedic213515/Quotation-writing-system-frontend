@@ -1,25 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Typography,
   Form,
   Input,
   Radio,
   Select,
-  Button,
   FloatButton,
   message,
+  Spin,
+  Typography,
+  Button,
 } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import moment from 'moment';
+
+const { TextArea } = Input;
 
 const BasicInput = ({ setActiveTab }) => {
-  const [name, setName] = useState('');
+  // Existing state
+  const [option, setOption] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [mainName, setMainName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [userCode, setUserCode] = useState('');
+  const token = localStorage.getItem('token');
   const [prefectures, setPrefectures] = useState([]);
   const [cities, setCities] = useState([]);
-  const [selectedValue, setSelectedValue] = useState('0');
-  const [selected, setSelected] = useState('');
-  const [selectedRadio, setSelectedRadio] = useState('');
-  const [location, setLocation] = useState('');
+  const [selectedMainAddressValue, setSelectedMainAddressValue] = useState('0');
+  const [selectedMainPrefecture, setSelectedMainPrefecture] = useState('');
+  const [selectedMainCity, setSelectedMainCity] = useState('');
+  const [mainOtherAddress, setMainOtherAddress] = useState('');
+  const [mainAddressLocation, setMainAddressLocation] = useState('');
+  const [selectedMain, setSelectedMain] = useState(null);
+  const [rowCount, setRowCount] = useState('');
+  const [selectedExportRadio, setSelectedExportRadio] = useState('');
+  const [selectedMainExportName, setSelectedMainExportName] = useState('');
+  const [selectedMainExportSubName, setSelectedMainExportSubName] =
+    useState('');
+  const [customerData, setCustomerData] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [mainImport, setMainImport] = useState('');
+
+  // New state for customer data processing
+  const [customerOption, setCustomerOption] = useState(null); // Selected option for postal code
+  const [customerName, setCustomerName] = useState('');
+  const [branchName, setBranchName] = useState('');
+  const [customerAddressValue, setCustomerAddressValue] = useState('0');
+  const [customerPrefecture, setCustomerPrefecture] = useState('');
+  const [customerCity, setCustomerCity] = useState('');
+  const [customerOtherAddress, setCustomerOtherAddress] = useState('');
+  const [customerAddressLocation, setCustomerAddressLocation] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerFax, setCustomerFax] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerWebsite, setCustomerWebsite] = useState('');
+  const [customerNotes, setCustomerNotes] = useState('');
+  const [customerRank, setCustomerRank] = useState('');
+  const [customerClosingDate, setCustomerClosingDate] = useState('');
+  const [customerGroup, setCustomerGroup] = useState('');
+
+  // Existing functions
+  const NumberDisplay = ({ number }) => {
+    fetchRowCount();
+    const formattedNumber = ((number ?? 0) + 1).toString().padStart(4, '0');
+    const decodedPayload = jwtDecode(token);
+    const decodedName = decodedPayload.name;
+    const decodedCode = decodedPayload.nameid;
+    setUserName(decodedName);
+    setUserCode(decodedCode);
+    const dayNumber = moment().format('YYMMDD');
+    const quotationNumber = userCode + dayNumber + formattedNumber;
+
+    return (
+      <div className="flex flex-row justify-start gap-10 mb-4">
+        <p>
+          作成者名 :<i className="text-blue-500">{userName}</i>
+        </p>
+        <p>
+          見積番号 : <i className=" text-green-500">{quotationNumber}</i>
+        </p>
+      </div>
+    );
+  };
+
+  const handleMainAddressRadioChange = (e) => {
+    setSelectedMainAddressValue(e.target.value);
+  };
 
   useEffect(() => {
     fetchPrefectures();
@@ -41,18 +107,13 @@ const BasicInput = ({ setActiveTab }) => {
     }
   };
 
-  const handlePrefectureChange = async (prefecture) => {
+  const handleMainPrefectureChange = async (prefecture) => {
     try {
-      console.log(prefecture);
-
       const response = await axios.get(`/api/address?city=${prefecture}`);
-
-      const filteredCities = response.data
-        .filter((item) => !item.delete)
-        .map((item) => ({
-          value: item.city,
-          label: item.city,
-        }));
+      const filteredCities = response.data.map((item) => ({
+        value: item,
+        label: item,
+      }));
       setCities(filteredCities);
     } catch (error) {
       console.error('Error fetching cities:', error);
@@ -60,25 +121,118 @@ const BasicInput = ({ setActiveTab }) => {
     }
   };
 
-  const handleRadioChange = (e) => {
-    setSelectedValue(e.target.value);
+  const handleMainSearch = async (value) => {
+    if (!value) {
+      setOption({
+        value: '一致するデータはありません。',
+        label: '一致するデータはありません。',
+      });
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/address/postalcode', {
+        params: { code: value },
+      });
+      setOption({
+        value: response.data[0].value,
+        label: response.data[0].label,
+      });
+    } catch (error) {
+      console.error('Error fetching postal code:', error);
+      setOption({
+        value: '一致するデータはありません。',
+        label: '一致するデータはありません。',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const radioChange = (e) => {
-    setSelectedRadio(e.target.value);
+  const handleMainChange = (value) => {
+    setSelectedMain(value);
   };
 
-  const handleSelectChange = (e) => {
-    setSelected(e);
-    console.log(`Selected: ${e}`);
+  const radioExportChange = (e) => {
+    setSelectedExportRadio(e.target.value);
   };
 
-  const handleSelectSearch = (e) => {
-    console.log(`Search: ${e}`);
+  const fetchRowCount = async () => {
+    try {
+      const response = await axios.get('api/quotationmain/count');
+      setRowCount(response.data.count);
+    } catch (error) {
+      console.error('Error fetching row count:', error);
+    }
+  };
+
+  const fetchExportData = async (e) => {
+    try {
+      const response = await axios.get(`/api/customer/group?number=${e}`);
+      setCustomerData(response.data);
+    } catch (error) {
+      console.error('Error fetching customer data:', error);
+      message.error('Failed to fetch customer data');
+    }
+  };
+
+  const handleCustomerSelect = (selectedOption) => {
+    setSelectedCustomer(
+      customerData.find((customer) => customer.name === selectedOption),
+    );
+  };
+
+  // New functions for customer data processing
+  const handleCustomerAddressRadioChange = (e) => {
+    setCustomerAddressValue(e.target.value);
+  };
+
+  const handleCustomerPrefectureChange = async (prefecture) => {
+    setCustomerPrefecture(prefecture);
+    try {
+      const response = await axios.get(`/api/address?city=${prefecture}`);
+      const filteredCities = response.data.map((item) => ({
+        value: item,
+        label: item,
+      }));
+      setCities(filteredCities);
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      message.error('Failed to fetch cities');
+    }
+  };
+
+  const handleCustomerPostalSearch = async (postalCode) => {
+    if (!postalCode) {
+      setCustomerOption(null); // Clear the option if input is empty
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/customer/postalcode', {
+        params: { code: postalCode },
+      });
+      const data = response.data[0];
+      setCustomerOption({
+        value: data.value, // Backend "value"
+        label: data.label, // Backend "label"
+      });
+    } catch (error) {
+      console.error('Error fetching postal code:', error);
+      setCustomerOption(null); // Clear the option on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveCustomerData = () => {
+    // Implement the logic to save customer data
+    message.success('Customer data saved successfully');
   };
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
+      <NumberDisplay number={rowCount} />
       <Form
         layout="vertical"
         className="border border-t-0 border-x-0 border-b-[#000000b8]"
@@ -87,17 +241,17 @@ const BasicInput = ({ setActiveTab }) => {
           <div className="w-full md:w-1/2">
             <Form.Item label="① 工事名称 :" required>
               <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={mainName}
+                onChange={(e) => setMainName(e.target.value)}
                 allowClear
-                placeholder="Enter construction name"
+                placeholder="工事名称を入力してください。"
                 className="w-full"
               />
             </Form.Item>
             <Form.Item label="② 工事場所 :" required>
               <Radio.Group
-                onChange={handleRadioChange}
-                value={selectedValue}
+                onChange={handleMainAddressRadioChange}
+                value={selectedMainAddressValue}
                 className="flex flex-col gap-4"
               >
                 <div className="flex items-center gap-2 justify-start">
@@ -108,43 +262,43 @@ const BasicInput = ({ setActiveTab }) => {
                     <Select
                       placeholder="県"
                       className="w-full"
-                      disabled={selectedValue !== '1'}
+                      disabled={selectedMainAddressValue !== '1'}
                       allowClear
-                      onChange={handlePrefectureChange}
+                      onSelect={(e) => setSelectedMainPrefecture(e)}
+                      onChange={handleMainPrefectureChange}
                       options={prefectures}
                     />
                     <Select
                       placeholder="都市"
                       className="w-full"
-                      disabled={selectedValue !== '1'}
+                      disabled={selectedMainAddressValue !== '1'}
                       allowClear
+                      onChange={setSelectedMainCity}
                       options={cities}
                     />
                     <Input
-                      placeholder="Other location"
-                      disabled={selectedValue !== '1'}
+                      disabled={selectedMainAddressValue !== '1'}
                       allowClear
                       className="w-full"
+                      onChange={(e) => setMainOtherAddress(e.target.value)}
                     />
                   </div>
                 </div>
-
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="2" style={{ width: 150 }}>
                     直接入力 :
                   </Radio>
                   <div className="flex-grow">
                     <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      disabled={selectedValue !== '2'}
-                      placeholder="Enter location directly"
+                      value={mainAddressLocation}
+                      onChange={(e) => setMainAddressLocation(e.target.value)}
+                      disabled={selectedMainAddressValue !== '2'}
+                      placeholder="手動で入力してください。"
                       allowClear
                       className="w-full"
                     />
                   </div>
                 </div>
-
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="3" style={{ width: 150 }}>
                     郵便番号検索 :
@@ -152,19 +306,27 @@ const BasicInput = ({ setActiveTab }) => {
                   <div className="flex-grow">
                     <Select
                       showSearch
-                      value={selected}
-                      placeholder="Search by postal code"
-                      disabled={selectedValue !== '3'}
-                      optionFilterProp="label"
-                      onChange={handleSelectChange}
-                      onSearch={handleSelectSearch}
+                      value={option.label}
+                      disabled={selectedMainAddressValue !== '3'}
+                      onSearch={(value) => {
+                        /* Wait for the user to press Enter */
+                      }}
+                      onInputKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleMainSearch(e.target.value);
+                        }
+                      }}
+                      onChange={handleMainChange}
                       allowClear
+                      notFoundContent={
+                        loading ? (
+                          <Spin size="small" />
+                        ) : (
+                          '一致するデータはありません。'
+                        )
+                      }
+                      options={option ? [option] : []}
                       className="w-full"
-                      options={[
-                        { value: 'jack', label: '132' },
-                        { value: 'lucy', label: '456' },
-                        { value: 'tom', label: '123' },
-                      ]}
                     />
                   </div>
                 </div>
@@ -174,8 +336,8 @@ const BasicInput = ({ setActiveTab }) => {
           <div className="w-full md:w-1/2">
             <Form.Item label="③ 提出先 :" required>
               <Radio.Group
-                value={selectedRadio}
-                onChange={radioChange}
+                value={selectedExportRadio}
+                onChange={radioExportChange}
                 className="flex flex-col gap-4"
               >
                 <div className="flex items-center gap-2 justify-start">
@@ -185,14 +347,20 @@ const BasicInput = ({ setActiveTab }) => {
                       <Input
                         placeholder="得意先名"
                         allowClear
-                        disabled={selectedRadio && selectedRadio !== 'type'}
+                        disabled={selectedExportRadio !== 'type'}
                         className="w-full"
+                        onChange={(e) =>
+                          setSelectedMainExportName(e.target.value)
+                        }
                       />
                     </div>
                     <Input
                       placeholder="支社名"
                       allowClear
-                      disabled={selectedRadio && selectedRadio !== 'type'}
+                      onChange={(e) =>
+                        setSelectedMainExportSubName(e.target.value)
+                      }
+                      disabled={selectedExportRadio !== 'type'}
                       className="w-full"
                     />
                   </div>
@@ -205,23 +373,26 @@ const BasicInput = ({ setActiveTab }) => {
                       className="w-full"
                       popupMatchSelectWidth={false}
                       placement="bottomLeft"
-                      disabled={selectedRadio && selectedRadio !== 'select'}
+                      onSelect={(e) => {
+                        fetchExportData(e);
+                      }}
+                      disabled={selectedExportRadio !== 'select'}
                       allowClear
                       options={[
-                        { value: 'ア', label: 'ア' },
-                        { value: 'カ', label: 'カ' },
-                        { value: 'サ', label: 'サ' },
-                        { value: 'タ', label: 'タ' },
-                        { value: 'ナ', label: 'ナ' },
-                        { value: 'ハ', label: 'ハ' },
-                        { value: 'マ', label: 'マ' },
-                        { value: 'ヤ', label: 'ヤ' },
-                        { value: 'ラ', label: 'ラ' },
-                        { value: 'ワ', label: 'ワ' },
+                        { value: '1', label: 'ア' },
+                        { value: '2', label: 'カ' },
+                        { value: '3', label: 'サ' },
+                        { value: '4', label: 'タ' },
+                        { value: '5', label: 'ナ' },
+                        { value: '6', label: 'ハ' },
+                        { value: '7', label: 'マ' },
+                        { value: '8', label: 'ヤ' },
+                        { value: '9', label: 'ラ' },
+                        { value: '10', label: 'ワ' },
                       ]}
                     />
                   </div>
-                  <div className="flex-col flex-grow flex gap-4">
+                  <div>
                     <Select
                       suffixIcon
                       showSearch
@@ -229,13 +400,19 @@ const BasicInput = ({ setActiveTab }) => {
                       className="w-full"
                       popupMatchSelectWidth={false}
                       placement="bottomLeft"
-                      disabled={selectedRadio && selectedRadio !== 'select'}
+                      disabled={selectedExportRadio !== 'select'}
                       allowClear
-                      options={[
-                        { value: 'Tokyo', label: 'Tokyo' },
-                        { value: 'Osaka', label: 'Osaka' },
-                      ]}
+                      options={customerData.map((customer) => ({
+                        value: customer.name,
+                        label: customer.name,
+                      }))}
+                      onChange={handleCustomerSelect}
+                      value={
+                        selectedCustomer ? selectedCustomer.name : undefined
+                      }
                     />
+                  </div>
+                  <div className="flex-col flex-grow flex gap-4">
                     <Select
                       suffixIcon
                       showSearch
@@ -243,22 +420,22 @@ const BasicInput = ({ setActiveTab }) => {
                       popupMatchSelectWidth={false}
                       placement="bottomLeft"
                       placeholder="支社名"
-                      disabled={selectedRadio && selectedRadio !== 'select'}
-                      allowClear
-                      options={[
-                        { value: 'Tokyo', label: 'Tokyo' },
-                        { value: 'Osaka', label: 'Osaka' },
-                      ]}
+                      disabled={true}
+                      value={
+                        selectedCustomer ? selectedCustomer.subName : undefined
+                      }
                     />
                   </div>
                 </div>
               </Radio.Group>
             </Form.Item>
+            <Form.Item label="④ 仕入先 : " required>
+              <Input onChange={(e) => setMainImport(e.target.value)} />
+            </Form.Item>
           </div>
         </div>
       </Form>
 
-      {/* Display Selected Value */}
       <Typography variant="body1" className="my-4 text-blue-gray-500">
         ※ 得意先データ処理
       </Typography>
@@ -271,12 +448,13 @@ const BasicInput = ({ setActiveTab }) => {
                   label="得意先名 :"
                   required
                   style={{ width: 150 }}
-                  className=" flex-grow gap-2 w-full"
+                  className="flex-grow gap-2 w-full"
                 >
                   <Input
                     placeholder="得意先名"
                     allowClear
-                    disabled={selectedRadio && selectedRadio !== 'type'}
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
                     className="w-full"
                   />
                 </Form.Item>
@@ -286,25 +464,24 @@ const BasicInput = ({ setActiveTab }) => {
                   label="支社名 :"
                   required
                   style={{ width: 150 }}
-                  className=" flex-grow gap-2 w-full"
+                  className="flex-grow gap-2 w-full"
                 >
                   <Input
                     placeholder="支社名"
                     allowClear
-                    disabled={selectedRadio && selectedRadio !== 'type'}
+                    value={branchName}
+                    onChange={(e) => setBranchName(e.target.value)}
                     className="w-full"
                   />
                 </Form.Item>
               </div>
             </div>
-
             <Form.Item layout="vertical" label="場所 :" required>
               <Radio.Group
-                onChange={handleRadioChange}
-                value={selectedValue}
+                onChange={handleCustomerAddressRadioChange}
+                value={customerAddressValue}
                 className="flex flex-col gap-4"
               >
-                {/* Option 1: 都道府県選択 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="1" style={{ width: 150 }}>
                     都道府県 :
@@ -316,12 +493,11 @@ const BasicInput = ({ setActiveTab }) => {
                       className="w-full"
                       popupMatchSelectWidth={false}
                       placement="bottomLeft"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      disabled={customerAddressValue !== '1'}
                       allowClear
-                      options={[
-                        { value: 'Tokyo', label: 'Tokyo' },
-                        { value: 'Osaka', label: 'Osaka' },
-                      ]}
+                      value={customerPrefecture}
+                      onChange={handleCustomerPrefectureChange}
+                      options={prefectures}
                     />
                     <Select
                       suffixIcon
@@ -329,40 +505,39 @@ const BasicInput = ({ setActiveTab }) => {
                       className="w-full"
                       popupMatchSelectWidth={false}
                       placement="bottomLeft"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      disabled={customerAddressValue !== '1'}
                       allowClear
-                      options={[
-                        { value: 'Shibuya', label: 'Shibuya' },
-                        { value: 'Namba', label: 'Namba' },
-                      ]}
+                      value={customerCity}
+                      onChange={(value) => setCustomerCity(value)}
+                      options={cities}
                     />
                     <Input
-                      placeholder="Other location"
-                      disabled={selectedValue && selectedValue !== '1'}
+                      placeholder="その他"
+                      disabled={customerAddressValue !== '1'}
                       allowClear
                       className="w-full"
+                      value={customerOtherAddress}
+                      onChange={(e) => setCustomerOtherAddress(e.target.value)}
                     />
                   </div>
                 </div>
-
-                {/* Option 2: 直接入力 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="2" style={{ width: 150 }}>
                     直接入力 :
                   </Radio>
                   <div className="flex-grow">
                     <Input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      disabled={selectedValue && selectedValue !== '2'}
-                      placeholder="Enter location directly"
+                      value={customerAddressLocation}
+                      onChange={(e) =>
+                        setCustomerAddressLocation(e.target.value)
+                      }
+                      disabled={customerAddressValue !== '2'}
+                      placeholder="住所を直接入力"
                       allowClear
                       className="w-full"
                     />
                   </div>
                 </div>
-
-                {/* Option 3: 郵便番号検索 */}
                 <div className="flex items-center gap-2 justify-start">
                   <Radio value="3" style={{ width: 150 }}>
                     郵便番号検索 :
@@ -370,22 +545,27 @@ const BasicInput = ({ setActiveTab }) => {
                   <div className="flex-grow">
                     <Select
                       showSearch
-                      suffixIcon
-                      className="w-full"
-                      popupMatchSelectWidth={false}
-                      placement="bottomLeft"
-                      value={selected}
-                      placeholder="Search by postal code"
-                      disabled={selectedValue && selectedValue !== '3'}
-                      optionFilterProp="label"
-                      onChange={handleSelectChange}
-                      onSearch={handleSelectSearch}
+                      value={customerOption?.label} // Display the label of the selected option
+                      disabled={customerAddressValue !== '3'} // Disable when the condition is not met
+                      onSearch={(value) => {
+                        /* Wait for the user to press Enter */
+                      }}
+                      onInputKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCustomerPostalSearch(e.target.value); // Trigger search on Enter
+                        }
+                      }}
+                      onChange={(value) => setSelectedCustomerOption(value)} // Update the selected value
                       allowClear
-                      options={[
-                        { value: 'jack', label: '132' },
-                        { value: 'lucy', label: '456' },
-                        { value: 'tom', label: '123' },
-                      ]}
+                      notFoundContent={
+                        loading ? (
+                          <Spin size="small" />
+                        ) : (
+                          '一致するデータはありません。' // Fallback text if no matching data
+                        )
+                      }
+                      options={customerOption ? [customerOption] : []} // Show the single result if available
+                      className="w-full"
                     />
                   </div>
                 </div>
@@ -394,19 +574,39 @@ const BasicInput = ({ setActiveTab }) => {
           </div>
           <div className="w-full md:w-1/2">
             <Form.Item label="電話番号">
-              <Input className="w-full" />
+              <Input
+                className="w-full"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+              />
             </Form.Item>
             <Form.Item label="FAX">
-              <Input className="w-full" />
+              <Input
+                className="w-full"
+                value={customerFax}
+                onChange={(e) => setCustomerFax(e.target.value)}
+              />
             </Form.Item>
             <Form.Item label="メール">
-              <Input className="w-full" />
+              <Input
+                className="w-full"
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+              />
             </Form.Item>
             <Form.Item label="HPアドレス">
-              <Input className="w-full" />
+              <Input
+                className="w-full"
+                value={customerWebsite}
+                onChange={(e) => setCustomerWebsite(e.target.value)}
+              />
             </Form.Item>
             <Form.Item label="備考">
-              <TextArea className="w-full" />
+              <TextArea
+                className="w-full"
+                value={customerNotes}
+                onChange={(e) => setCustomerNotes(e.target.value)}
+              />
             </Form.Item>
           </div>
         </div>
@@ -417,8 +617,9 @@ const BasicInput = ({ setActiveTab }) => {
               className="w-full"
               popupMatchSelectWidth={false}
               placement="bottomLeft"
-              disabled={selectedRadio && selectedRadio !== 'select'}
               allowClear
+              value={customerRank}
+              onChange={(value) => setCustomerRank(value)}
               options={[
                 { value: 'A', label: 'A' },
                 { value: 'B', label: 'B' },
@@ -434,41 +635,13 @@ const BasicInput = ({ setActiveTab }) => {
               className="w-full"
               popupMatchSelectWidth={false}
               placement="bottomLeft"
-              disabled={selectedRadio && selectedRadio !== 'select'}
               allowClear
-              options={[
-                { value: '1', label: '1' },
-                { value: '2', label: '2' },
-                { value: '3', label: '3' },
-                { value: '4', label: '4' },
-                { value: '5', label: '5' },
-                { value: '6', label: '6' },
-                { value: '7', label: '7' },
-                { value: '8', label: '8' },
-                { value: '9', label: '9' },
-                { value: '10', label: '10' },
-                { value: '11', label: '11' },
-                { value: '12', label: '12' },
-                { value: '13', label: '13' },
-                { value: '14', label: '14' },
-                { value: '15', label: '15' },
-                { value: '16', label: '16' },
-                { value: '17', label: '17' },
-                { value: '18', label: '18' },
-                { value: '19', label: '19' },
-                { value: '20', label: '20' },
-                { value: '21', label: '21' },
-                { value: '22', label: '22' },
-                { value: '23', label: '23' },
-                { value: '24', label: '24' },
-                { value: '25', label: '25' },
-                { value: '26', label: '26' },
-                { value: '27', label: '27' },
-                { value: '28', label: '28' },
-                { value: '29', label: '29' },
-                { value: '30', label: '30' },
-                { value: '31', label: '31' },
-              ]}
+              value={customerClosingDate}
+              onChange={(value) => setCustomerClosingDate(value)}
+              options={Array.from({ length: 31 }, (_, i) => ({
+                value: `${i + 1}`,
+                label: `${i + 1}`,
+              }))}
             />
           </Form.Item>
           <Form.Item label="グループ設定">
@@ -477,8 +650,9 @@ const BasicInput = ({ setActiveTab }) => {
               className="w-full"
               popupMatchSelectWidth={false}
               placement="bottomLeft"
-              disabled={selectedRadio && selectedRadio !== 'select'}
               allowClear
+              value={customerGroup}
+              onChange={(value) => setCustomerGroup(value)}
               options={[
                 { value: 'ア', label: 'ア' },
                 { value: 'カ', label: 'カ' },
@@ -495,7 +669,7 @@ const BasicInput = ({ setActiveTab }) => {
           </Form.Item>
           <Form.Item className="flex justify-end">
             <Button
-              type="submit"
+              onClick={handleSaveCustomerData}
               className="w-full md:w-auto px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
               保管
@@ -503,9 +677,13 @@ const BasicInput = ({ setActiveTab }) => {
           </Form.Item>
         </div>
       </Form>
+
       <FloatButton
         shape="square"
         type="primary"
+        onClick={() => {
+          setActiveTab('addition');
+        }}
         description="次へ"
         className="mb-16 mr-10 animate-bounce"
       />
