@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import {
   Button,
@@ -10,12 +10,35 @@ import {
   Select,
   FloatButton,
 } from 'antd';
-
-const { Text } = Typography;
+import axios from 'axios';
 
 const StepInput = ({ setActiveTab }) => {
   const [form] = Form.useForm();
-
+  const [options, setOptions] = useState([]);
+  const fetchConstruction = async () => {
+    try {
+      const { Text } = Typography;
+      const response = await axios.get('/api/construction');
+      const option = response.data
+        .filter((item) => !item.delete)
+        .map((item) => ({
+          value: item.name,
+          label: item.name,
+        }))
+        .filter(
+          (item, index, self) =>
+            index === self.findIndex((t) => t.value === item.value),
+        );
+      setOptions(option);
+      console.log(response);
+    } catch (error) {
+      console.error('Error fetching constructions:', error);
+      message.error('Failed to fetch prefectures');
+    }
+  };
+  useEffect(() => {
+    fetchConstruction();
+  }, []);
   const renderTreeData = (data) => {
     if (!data || !data.items) return [];
 
@@ -36,14 +59,6 @@ const StepInput = ({ setActiveTab }) => {
       <Form
         form={form}
         name="dynamic_form_complex"
-        initialValues={{
-          items: [
-            {
-              基本工種: 'aa',
-              部分工種: [{ 部分工種1: 'bb', 部分工種2: 'cc' }],
-            },
-          ],
-        }}
         className="flex justify-between gap-4 w-full"
       >
         <div
@@ -62,8 +77,12 @@ const StepInput = ({ setActiveTab }) => {
                     key={field.key}
                     extra={<CloseOutlined onClick={() => remove(field.name)} />}
                   >
-                    <Form.Item label="基本工種" name={[field.name, '基本工種']}>
-                      <Select allowClear />
+                    <Form.Item
+                      required
+                      label="基本工種"
+                      name={[field.name, '基本工種']}
+                    >
+                      <Select allowClear options={options} />
                     </Form.Item>
 
                     <Form.Item label="部分工種">
@@ -77,21 +96,37 @@ const StepInput = ({ setActiveTab }) => {
                             }}
                           >
                             {subFields.map((subField) => (
-                              <Space key={subField.key}>
+                              <Space
+                                key={subField.key}
+                                style={{ display: 'flex', width: '100%' }}
+                              >
                                 <Form.Item
                                   noStyle
                                   name={[subField.name, '部分工種1']}
+                                  style={{ flex: 1 }}
                                 >
-                                  <Select allowClear placeholder="部分工種1" />
+                                  <Select
+                                    allowClear
+                                    placeholder="部分工種1"
+                                    options={options}
+                                    style={{ width: '100%' }}
+                                  />
                                 </Form.Item>
                                 <Form.Item
                                   noStyle
                                   name={[subField.name, '部分工種2']}
+                                  style={{ flex: 1 }}
                                 >
-                                  <Select allowClear placeholder="部分工種2" />
+                                  <Select
+                                    allowClear
+                                    placeholder="部分工種2"
+                                    options={options}
+                                    style={{ width: '100%' }}
+                                  />
                                 </Form.Item>
                                 <CloseOutlined
                                   onClick={() => subOpt.remove(subField.name)}
+                                  style={{ padding: '0 8px' }}
                                 />
                               </Space>
                             ))}
