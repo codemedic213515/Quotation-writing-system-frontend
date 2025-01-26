@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Card,
   CardBody,
@@ -17,9 +17,12 @@ import AdditionalInput from '@/components/createQuotation/AdditionalInput';
 import StepInput from '@/components/createQuotation/StepInput';
 import MaterialInput from '@/components/createQuotation/MaterialInput';
 
-import { Link } from 'react-router-dom';
 export function CreateQuotation() {
   const [activeTab, setActiveTab] = useState('basic');
+  const [number, setNumber] = useState('');
+  useEffect(() => {
+    setActiveTab;
+  }, []);
   return (
     <div>
       <div className="relative mt-8 h-28 w-full overflow-hidden rounded-xl ">
@@ -97,13 +100,15 @@ export function CreateQuotation() {
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
             {activeTab === 'basic' && (
-              <BasicInput setActiveTab={setActiveTab} />
+              <BasicInput setActiveTab={setActiveTab} setNumber={setNumber} />
             )}
             {activeTab === 'addition' && (
-              <AdditionalInput setActiveTab={setActiveTab} />
+              <AdditionalInput setActiveTab={setActiveTab} number={number} />
             )}
-            {activeTab === 'step' && <StepInput setActiveTab={setActiveTab} />}
-            {activeTab === 'material' && <MaterialInput />}
+            {activeTab === 'step' && (
+              <StepInput setActiveTab={setActiveTab} number={number} />
+            )}
+            {activeTab === 'material' && <MaterialInput number={number} />}
           </div>
         </CardBody>
       </Card>
