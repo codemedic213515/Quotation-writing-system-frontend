@@ -1,4 +1,5 @@
 import { Form, Radio, Input, FloatButton } from 'antd';
+import StepInput from './StepInput';
 
 const AdditionalInput = ({ setActiveTab }) => (
   <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
@@ -67,6 +68,7 @@ const AdditionalInput = ({ setActiveTab }) => (
       shape="square"
       type="primary"
       description="次へ"
+      onClick={(e) => setActiveTab('step')}
       className="mb-16 mr-10 animate-bounce"
     />
   </div>
