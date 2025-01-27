@@ -19,6 +19,7 @@ const MaterialInput = ({ number }) => {
   const [category2Option, setCategory2Option] = useState({});
   const [category3Option, setCategory3Option] = useState({});
   const [category4Option, setCategory4Option] = useState({});
+  const [unitOption, setUnitOption] = useState([]);
   const [materialData, setMaterialData] = useState({});
 
   // Fetch quotationTypes based on number
@@ -28,6 +29,21 @@ const MaterialInput = ({ number }) => {
       setQuotationData(response.data);
     } catch (error) {
       console.error('Error fetching quotation data:', error);
+    }
+  };
+
+  const fetchUnitData = async () => {
+    try {
+      const response = await axios.get(`api/unit`);
+      const unitData = response.data
+        .filter((item) => !item.delete)
+        .map((item) => ({
+          id: item.id,
+          value: item.name,
+        }));
+      setUnitOption(unitData);
+    } catch (error) {
+      console.error('Error fetching Unit data:', error);
     }
   };
 
@@ -89,27 +105,130 @@ const MaterialInput = ({ number }) => {
   };
 
   // Fetch materials based on all selected category ids
-  const fetchMaterials = async (
-    category1Id,
-    category2Id,
-    category3Id,
-    category4Id,
-    index,
-  ) => {
+  const fetchMaterials = async (category1Id, category2Id, category3Id) => {
     try {
       const response = await axios.get(
-        `api/materials?category1=${category1Id}&category2=${category2Id}&category3=${category3Id}&category4=${category4Id}`,
+        `api/material?category1=${category1Id}&category2=${category2Id}&category3=${category3Id}`,
       );
-      setMaterialData((prev) => ({ ...prev, [index]: response.data }));
+      // setMaterialData((prev) => ({ ...prev, [index]: response.data }));
+      setMaterialData(response.data);
     } catch (error) {
       console.error('Error fetching materials:', error);
     }
   };
 
+  // Handle category1 select
+  const handleCategory1Change = (value, index) => {
+    const current = form.getFieldValue(`materials-${index}`) || {};
+    form.setFieldsValue({
+      [`materials-${index}`]: {
+        ...current,
+        category1: value,
+        category2: undefined, // Reset category2, category3, category4 when category1 changes
+        category3: undefined,
+        category4: undefined,
+      },
+    });
+    console.log(current);
+
+    fetchCategory2(value, index);
+  };
+
+  // Handle category2 select
+  const handleCategory2Change = (value, index) => {
+    const current = form.getFieldValue(`materials-${index}`) || {};
+    form.setFieldsValue({
+      [`materials-${index}`]: {
+        ...current,
+        category2: value,
+        category3: undefined, // Reset category3, category4 when category2 changes
+        category4: undefined,
+      },
+    });
+    console.log(current);
+    fetchCategory3(current[0].category1, value, index);
+  };
+
+  // Handle category3 select
+  const handleCategory3Change = (value, index) => {
+    const current = form.getFieldValue(`materials-${index}`) || {};
+    form.setFieldsValue({
+      [`materials-${index}`]: {
+        ...current,
+        category3: value,
+        category4: undefined, // Reset category4 when category3 changes
+      },
+    });
+    console.log(current);
+    fetchMaterials(
+      current[0].category1,
+      current[0].category2,
+      current[0].category3,
+      value,
+      index,
+    );
+    fetchCategory4(current[0].category1, current[0].category2, value, index);
+  };
+
+  // Handle category4 select
+  const handleCategory4Change = (value, index) => {
+    const current = form.getFieldValue(`materials-${index}`) || {};
+    form.setFieldsValue({
+      [`materials-${index}`]: {
+        ...current,
+        category4: value,
+      },
+    });
+    console.log(current);
+  };
+
   useEffect(() => {
     fetchQuotationData();
     fetchCategory1();
+    fetchUnitData();
   }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const formValues = form.getFieldsValue();
+      const allCardData = [];
+      Object.keys(formValues).forEach((key) => {
+        const card = formValues[key];
+        const selectedCategories = {
+          category1: card.category1,
+          category2: card.category2,
+          category3: card.category3,
+          category4: card.category4,
+        };
+
+        // Add other inputs like quantity, unit, etc. here if needed
+        const materialData = {
+          quantity: card.quantity,
+          unit: card.unit,
+          unitPrice: card.unitPrice,
+          materialName: card.materialName,
+        };
+
+        allCardData.push({
+          number,
+          selectedCategories,
+          materialData,
+        });
+      });
+
+      const response = await axios.post('/api/save-materials', {
+        data: allCardData,
+      });
+      if (response.status === 200) {
+        message.success('Data saved successfully!');
+      } else {
+        message.error('Failed to save data');
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+      message.error('Error saving data');
+    }
+  };
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-hidden font-bold flex">
@@ -125,6 +244,7 @@ const MaterialInput = ({ number }) => {
           {quotationData.map((item, index) => (
             <Card
               key={index}
+              className="mb-4 border-gray-400"
               size="small"
               title={`${item.category1} - ${item.category2} - ${item.category3} - ${item.category4}`}
             >
@@ -143,17 +263,9 @@ const MaterialInput = ({ number }) => {
                           <Select
                             allowClear
                             placeholder="品名"
-                            onSelect={(value) => {
-                              const currentValues =
-                                form.getFieldValue(`materials-${index}`) || {};
-                              form.setFieldsValue({
-                                [`materials-${index}`]: {
-                                  ...currentValues,
-                                  category1: value,
-                                },
-                              });
-                              fetchCategory2(value, index);
-                            }}
+                            onSelect={(value) =>
+                              handleCategory1Change(value, index)
+                            }
                             options={category1Option.map((item) => ({
                               label: item.value,
                               value: item.id,
@@ -165,27 +277,9 @@ const MaterialInput = ({ number }) => {
                           <Select
                             allowClear
                             placeholder="名称"
-                            onSelect={(value) => {
-                              const currentValues =
-                                form.getFieldValue(`materials-${index}`) || {};
-                              if (!currentValues.category1) {
-                                message.error(
-                                  'Category 1 must be selected first',
-                                );
-                                return;
-                              }
-                              form.setFieldsValue({
-                                [`materials-${index}`]: {
-                                  ...currentValues,
-                                  category2: value,
-                                },
-                              });
-                              fetchCategory3(
-                                currentValues.category1,
-                                value,
-                                index,
-                              );
-                            }}
+                            onSelect={(value) =>
+                              handleCategory2Change(value, index)
+                            }
                             options={category2Option[index]?.map((item) => ({
                               label: item.name,
                               value: item.category2,
@@ -198,31 +292,9 @@ const MaterialInput = ({ number }) => {
                           <Select
                             allowClear
                             placeholder="規格"
-                            onSelect={(value) => {
-                              const currentValues =
-                                form.getFieldValue(`materials-${index}`) || {};
-                              if (
-                                !currentValues.category1 ||
-                                !currentValues.category2
-                              ) {
-                                message.error(
-                                  'Please select Category 1 and Category 2 first',
-                                );
-                                return;
-                              }
-                              form.setFieldsValue({
-                                [`materials-${index}`]: {
-                                  ...currentValues,
-                                  category3: value,
-                                },
-                              });
-                              fetchCategory4(
-                                currentValues.category1,
-                                currentValues.category2,
-                                value,
-                                index,
-                              );
-                            }}
+                            onSelect={(value) =>
+                              handleCategory3Change(value, index)
+                            }
                             options={category3Option[index]?.map((item) => ({
                               label: item.name,
                               value: item.category3,
@@ -235,33 +307,9 @@ const MaterialInput = ({ number }) => {
                           <Select
                             allowClear
                             placeholder="規格"
-                            onSelect={(value) => {
-                              const currentValues =
-                                form.getFieldValue(`materials-${index}`) || {};
-                              if (
-                                !currentValues.category1 ||
-                                !currentValues.category2 ||
-                                !currentValues.category3
-                              ) {
-                                message.error(
-                                  'Please select all previous categories first',
-                                );
-                                return;
-                              }
-                              form.setFieldsValue({
-                                [`materials-${index}`]: {
-                                  ...currentValues,
-                                  category4: value,
-                                },
-                              });
-                              fetchMaterials(
-                                currentValues.category1,
-                                currentValues.category2,
-                                currentValues.category3,
-                                value,
-                                index,
-                              );
-                            }}
+                            onSelect={(value) =>
+                              handleCategory4Change(value, index)
+                            }
                             options={category4Option[index]?.map((item) => ({
                               label: item.name,
                               value: item.category4,
@@ -271,7 +319,11 @@ const MaterialInput = ({ number }) => {
                         </Form.Item>
 
                         <Input allowClear placeholder="数量" />
-                        <Select allowClear placeholder="単位" />
+                        <Select
+                          allowClear
+                          placeholder="単位"
+                          options={unitOption}
+                        />
                         <Input allowClear placeholder="単価" />
                         <Input allowClear placeholder="歩掛" />
                         <Input allowClear placeholder="支給区分" />
@@ -294,6 +346,7 @@ const MaterialInput = ({ number }) => {
         shape="square"
         type="primary"
         description="作成"
+        onClick={handleSubmit}
         className="mb-16 mr-10 animate-bounce"
       />
     </div>
@@ -301,226 +354,3 @@ const MaterialInput = ({ number }) => {
 };
 
 export default MaterialInput;
-
-// import React, { useEffect, useState } from 'react';
-// import { CloseOutlined } from '@ant-design/icons';
-// import { Button, Card, Form, Space, Select, FloatButton, Input } from 'antd';
-// import axios from 'axios';
-
-// const MaterialInput = (number) => {
-//   const [form] = Form.useForm();
-//   const [category1Option, setCategory1Option] = useState([]);
-//   const [cat1, setCat1] = useState('');
-//   const [cat1Id, setCat1Id] = useState('');
-//   const [category2Option, setCategory2Option] = useState([]);
-//   const [cat2, setCat2] = useState('');
-//   const [cat2Id, setCat2Id] = useState('');
-//   const [category3Option, setCategory3Option] = useState([]);
-//   const [cat3, setCat3] = useState('');
-//   const [cat3Id, setCat3Id] = useState('');
-//   const [category4Option, setCategory4Option] = useState([]);
-//   const [cat4, setCat4] = useState('');
-//   const [cat4Id, setCat4Id] = useState('');
-//   const [productName, setProductName] = useState('');
-//   const [name, setName] = useState('');
-//   console.log(number);
-
-//   const category1 = async () => {
-//     const response = await axios.get('api/category1');
-//     const transformedData = response.data
-//       .filter((item) => !item.delete)
-//       .map((item) => ({
-//         id: item.id,
-//         value: item.name,
-//       }));
-//     console.log(transformedData);
-//     setCategory1Option(transformedData);
-//   };
-
-//   const category2 = async (category1Id) => {
-//     console.log(category1Id);
-
-//     const response = await axios.get(`api/category2?category1=${category1Id}`);
-//     const transformedData = response.data
-//       .filter((item) => !item.delete)
-//       .map((item) => ({
-//         id: item.category2,
-//         value: item.name,
-//       }));
-//     console.log(transformedData);
-//     setCategory2Option(transformedData);
-//   };
-
-//   const category3 = async (category2Id) => {
-//     const response = await axios.get(
-//       `api/category3/?category1=${category1Id}&category2=${category2Id}`,
-//     );
-//     const transformedData = response.data
-//       .filter((item) => !item.delete)
-//       .map((item) => ({
-//         id: item.category3,
-//         value: item.name,
-//       }));
-//     console.log(transformedData);
-//     setCategory3Option(transformedData);
-//   };
-
-//   const category4 = async (category3Id) => {
-//     const response = await axios.get(`api/category4/?category3=${category3Id}`);
-//     const transformedData = response.data
-//       .filter((item) => !item.delete)
-//       .map((item) => ({
-//         id: item.id,
-//         value: item.name,
-//       }));
-//     console.log(transformedData);
-//     setCategory4Option(transformedData);
-//   };
-
-//   useEffect(() => {
-//     category1();
-//   }, []);
-//   return (
-//     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-hidden font-bold flex">
-//       <Form
-//         form={form}
-//         name="dynamic_form_complex"
-//         className="flex justify-between gap-4 w-full"
-//         initialValues={{
-//           items: [
-//             {
-//               基本工種: 'aa',
-//               部分工種: [{ 部分工種1: 'bb', 部分工種2: 'cc' }],
-//             },
-//           ],
-//         }}
-//       >
-//         <div
-//           className="w-full overflow-auto pr-4"
-//           style={{ maxHeight: 'calc(60vh - 48px)' }}
-//         >
-//           <Form.List name="items">
-//             {(fields, { add, remove }) => (
-//               <div
-//                 style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}
-//               >
-//                 {fields.map((field) => (
-//                   <Card
-//                     size="small"
-//                     title={`工種 ${field.name + 1}`}
-//                     key={field.key}
-//                   >
-//                     <Form.Item label="部材入力">
-//                       <Form.List name={[field.name, '部材入力']}>
-//                         {(subFields, subOpt) => (
-//                           <div
-//                             style={{
-//                               display: 'flex',
-//                               flexDirection: 'column',
-//                               rowGap: 16,
-//                             }}
-//                           >
-//                             {subFields.map((subField) => (
-//                               <Space key={subField.key}>
-//                                 <Form.Item
-//                                   noStyle
-//                                   name={[subField.name, '部分工種1']}
-//                                 >
-//                                   <div className="flex flex-row items-center">
-//                                     <Select
-//                                       allowClear
-//                                       placeholder="品名"
-//                                       onSelect={(e) => {
-//                                         setCat1(e);
-//                                         const selectedCategory =
-//                                           category1Option.find(
-//                                             (item) => item.value === e,
-//                                           );
-//                                         if (selectedCategory) {
-//                                           category2(selectedCategory.id);
-//                                         }
-//                                       }}
-//                                       options={category1Option}
-//                                     />
-
-//                                     <Select
-//                                       allowClear
-//                                       placeholder="名称"
-//                                       onSelect={(e) => {
-//                                         setCat2(e);
-//                                         const selectedCategory =
-//                                           category2Option.find(
-//                                             (item) => item.value === e,
-//                                           );
-//                                         if (selectedCategory) {
-//                                           category3(selectedCategory.id);
-//                                         }
-//                                       }}
-//                                       options={category2Option}
-//                                     />
-//                                     <Select
-//                                       allowClear
-//                                       placeholder="規格"
-//                                       onSelect={(e) => {
-//                                         setCat3(e);
-//                                         const selectedCategory =
-//                                           category3Option.find(
-//                                             (item) => item.value === e,
-//                                           );
-//                                         if (selectedCategory) {
-//                                           category4(selectedCategory.id);
-//                                         }
-//                                       }}
-//                                       options={category3Option}
-//                                     />
-//                                     <Select
-//                                       allowClear
-//                                       placeholder="規格"
-//                                       onSelect={(e) => {
-//                                         setCat4(e);
-//                                       }}
-//                                       options={category4Option}
-//                                     />
-//                                     {'  :  '}
-//                                     <Input allowClear placeholder="数量" />
-//                                     <Select allowClear placeholder="単位" />
-//                                     <Input allowClear placeholder="単価" />
-//                                     <Input allowClear placeholder="歩掛" />
-//                                     <Input allowClear placeholder="支給区分" />
-//                                     <Select allowClear placeholder="分類名" />
-//                                   </div>
-//                                 </Form.Item>
-//                                 <CloseOutlined
-//                                   onClick={() => subOpt.remove(subField.name)}
-//                                 />
-//                               </Space>
-//                             ))}
-//                             <Button
-//                               type="dashed"
-//                               onClick={() => subOpt.add()}
-//                               block
-//                             >
-//                               + 部材入力追加
-//                             </Button>
-//                           </div>
-//                         )}
-//                       </Form.List>
-//                     </Form.Item>
-//                   </Card>
-//                 ))}
-//               </div>
-//             )}
-//           </Form.List>
-//         </div>
-//       </Form>
-//       <FloatButton
-//         shape="square"
-//         type="primary"
-//         description="作成"
-//         className="mb-16 mr-10 animate-bounce"
-//       />
-//     </div>
-//   );
-// };
-
-// export default MaterialInput;
