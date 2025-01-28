@@ -5,53 +5,144 @@ import {
   Card,
   Form,
   Space,
-  Typography,
   Tree,
   Select,
+  message,
   FloatButton,
 } from 'antd';
 import axios from 'axios';
 
-const StepInput = ({ setActiveTab }) => {
+const StepInput = ({ setActiveTab, number }) => {
   const [form] = Form.useForm();
   const [options, setOptions] = useState([]);
+
+  // Fetch construction data from API
   const fetchConstruction = async () => {
     try {
-      const { Text } = Typography;
       const response = await axios.get('/api/construction');
       const option = response.data
         .filter((item) => !item.delete)
         .map((item) => ({
           value: item.name,
           label: item.name,
-        }))
-        .filter(
-          (item, index, self) =>
-            index === self.findIndex((t) => t.value === item.value),
-        );
+          siteMiscell: item.siteMiscell,
+        }));
       setOptions(option);
-      console.log(response);
     } catch (error) {
       console.error('Error fetching constructions:', error);
-      message.error('Failed to fetch prefectures');
+      message.error('Failed to fetch construction data');
     }
   };
+
   useEffect(() => {
     fetchConstruction();
   }, []);
+
+  // Render Tree Data from the form values
   const renderTreeData = (data) => {
     if (!data || !data.items) return [];
-
     return data.items.map((item, itemIndex) => ({
-      title: `基本工種 ${itemIndex + 1}: ${item?.['基本工種'] || '未設定'}`,
+      title: `基本工種 ${itemIndex + 1}: ${item?.['基本工種'] || ''}`,
       key: `item-${itemIndex}-base`,
       children: (item?.['部分工種'] || []).map((subItem, subIndex) => ({
-        title: `部分工種1: ${subItem?.['部分工種1'] || '未設定'}, 部分工種2: ${
-          subItem?.['部分工種2'] || '未設定'
+        title: `部分工種1: ${subItem?.['部分工種1'] || ''}, 部分工種2: ${
+          subItem?.['部分工種2'] || ''
         }`,
         key: `item-${itemIndex}-part-${subIndex}`,
+        removalRate: item?.siteMiscell || '', // Access siteMiscell from the item, not subItem
       })),
     }));
+  };
+
+  // Transform the tree data for API
+  const transformData = () => {
+    const treeData = renderTreeData(form.getFieldsValue());
+    let result = [];
+    const code = number;
+
+    treeData.forEach((item) => {
+      const category1 = item.title.split(':')[1].trim(); // Extract Category1
+
+      item.children.forEach((subItem) => {
+        const [category2, category3] = subItem.title
+          .split(',')
+          .map((part) => part.split(':')[1]?.trim() || '');
+        const removalRate = subItem.removalRate || ''; // Capture removalRate from subItem
+        result.push({
+          Number: code || '',
+          Category1: category1,
+          Category2: category2 || '',
+          Category3: category3 || '',
+          Category4: '', // As per your example, no Category4 specified
+          Delete: 0,
+          RemovalRate: removalRate, // Assign the removalRate from the sub-category
+        });
+      });
+
+      // Handle case where there are no children
+      if (item.children.length === 0) {
+        result.push({
+          Number: code || '',
+          Category1: category1,
+          Category2: '',
+          Category3: '',
+          Category4: '',
+          Delete: 0,
+          RemovalRate: item.removalRate || '', // Use item.removalRate or a default value
+        });
+      }
+    });
+
+    return result;
+  };
+  const sendData = async () => {
+    try {
+      const transformedData = transformData(); // Assume this returns an array of QuotationType
+      console.log('Transformed data:', transformedData);
+
+      let allSuccessful = true; // Flag to track if all requests were successful
+
+      for (let i = 0; i < transformedData.length; i++) {
+        // Prepare the data in the expected format
+        const dataToSend = {
+          Number: transformedData[i].Number || '',
+          Category1: transformedData[i].Category1 || '',
+          Category2: transformedData[i].Category2 || '',
+          Category3: transformedData[i].Category3 || '',
+          Category4: transformedData[i].Category4 || '',
+          Delete: transformedData[i].Delete === 0, // Convert Delete to boolean
+          RemovalRate: transformedData[i].RemovalRate || 0,
+        };
+
+        try {
+          // Send each item one by one
+          const response = await axios.post('/api/quotationtype', dataToSend);
+
+          if (response.status === 200) {
+            console.log(`Create Type Success for item ${i + 1}`);
+          } else {
+            console.error(`Create type failed for item ${i + 1}`);
+            message.error(`Create type failed for item ${i + 1}`);
+            allSuccessful = false; // Set flag to false if any request fails
+          }
+        } catch (error) {
+          console.error(`Error creating type for item ${i + 1}:`, error);
+          message.error(`Create type failed for item ${i + 1}`);
+          allSuccessful = false;
+        }
+      }
+
+      // Show appropriate message based on request status
+      if (allSuccessful) {
+        message.success('All types created successfully!');
+        setActiveTab('material'); // Move to the next tab if successful
+      } else {
+        message.warning('Some types failed to create.');
+      }
+    } catch (error) {
+      message.error('Create type process failed!');
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -172,10 +263,12 @@ const StepInput = ({ setActiveTab }) => {
             }}
           </Form.Item>
         </div>
+
         <FloatButton
           shape="square"
           type="primary"
           description="次へ"
+          onClick={() => sendData()}
           className="mb-16 mr-10 animate-bounce"
         />
       </Form>

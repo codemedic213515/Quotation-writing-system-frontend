@@ -16,31 +16,29 @@ import moment from 'moment';
 
 const { TextArea } = Input;
 
-const BasicInput = ({ setActiveTab }) => {
+const BasicInput = ({ setActiveTab, setNumber }) => {
   // Existing state
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mainName, setMainName] = useState('');
   const [userName, setUserName] = useState('');
   const [userCode, setUserCode] = useState('');
+  const [quotationMark, setQuotationMark] = useState('');
   const token = localStorage.getItem('token');
   const [prefectures, setPrefectures] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedMainAddressValue, setSelectedMainAddressValue] = useState('0');
+  const [quotationAddress, setQuotationAddress] = useState('');
   const [selectedMainPrefecture, setSelectedMainPrefecture] = useState('');
   const [selectedMainCity, setSelectedMainCity] = useState('');
-  const [mainOtherAddress, setMainOtherAddress] = useState('');
-  const [mainAddressLocation, setMainAddressLocation] = useState('');
   const [selectedMain, setSelectedMain] = useState(null);
   const [rowCount, setRowCount] = useState('');
   const [selectedExportRadio, setSelectedExportRadio] = useState('');
   const [selectedMainExportName, setSelectedMainExportName] = useState('');
-  const [selectedMainExportSubName, setSelectedMainExportSubName] =
-    useState('');
   const [customerData, setCustomerData] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [mainImport, setMainImport] = useState('');
-
+  const [exportName, setExportName] = useState('');
   // New state for customer data processing
   const [customerOption, setCustomerOption] = useState(null); // Selected option for postal code
   const [customerName, setCustomerName] = useState('');
@@ -60,8 +58,8 @@ const BasicInput = ({ setActiveTab }) => {
   const [customerGroup, setCustomerGroup] = useState('');
 
   // Existing functions
+
   const NumberDisplay = ({ number }) => {
-    fetchRowCount();
     const formattedNumber = ((number ?? 0) + 1).toString().padStart(4, '0');
     const decodedPayload = jwtDecode(token);
     const decodedName = decodedPayload.name;
@@ -70,7 +68,7 @@ const BasicInput = ({ setActiveTab }) => {
     setUserCode(decodedCode);
     const dayNumber = moment().format('YYMMDD');
     const quotationNumber = userCode + dayNumber + formattedNumber;
-
+    setQuotationMark(quotationNumber);
     return (
       <div className="flex flex-row justify-start gap-10 mb-4">
         <p>
@@ -86,9 +84,43 @@ const BasicInput = ({ setActiveTab }) => {
   const handleMainAddressRadioChange = (e) => {
     setSelectedMainAddressValue(e.target.value);
   };
+  const setMainOtherAddress = (e) => {
+    const a = selectedMainPrefecture + '  ' + selectedMainCity + '  ' + e;
+    setQuotationAddress(a);
+  };
+  const setMainAddressLocation = (e) => {
+    setQuotationAddress(e);
+  };
+
+  const setSelectedMainExportSubName = (e) => {
+    const a = selectedMainExportName + '  ' + e;
+    setExportName(a);
+  };
+
+  const sendData = async () => {
+    const data = {
+      Code: quotationMark,
+      Creater: userName,
+      Name: mainName,
+      Address: quotationAddress,
+      Export: exportName,
+      Import: mainImport,
+    };
+    const response = await axios.post('/api/quotationmain', data);
+    if (response.status === 200) {
+      setNumber(quotationMark);
+      setActiveTab('addition');
+      message.success('Create Quotation Success!');
+      console.log(response);
+    } else {
+      console.log(response);
+      message.error('Failed create Quotation');
+    }
+  };
 
   useEffect(() => {
     fetchPrefectures();
+    fetchRowCount();
   }, []);
 
   const fetchPrefectures = async () => {
@@ -127,6 +159,7 @@ const BasicInput = ({ setActiveTab }) => {
         value: '一致するデータはありません。',
         label: '一致するデータはありません。',
       });
+      setQuotationAddress('');
       return;
     }
     setLoading(true);
@@ -138,12 +171,14 @@ const BasicInput = ({ setActiveTab }) => {
         value: response.data[0].value,
         label: response.data[0].label,
       });
+      setQuotationAddress(response.data[0].label);
     } catch (error) {
       console.error('Error fetching postal code:', error);
       setOption({
         value: '一致するデータはありません。',
         label: '一致するデータはありません。',
       });
+      setQuotationAddress('');
     } finally {
       setLoading(false);
     }
@@ -160,7 +195,7 @@ const BasicInput = ({ setActiveTab }) => {
   const fetchRowCount = async () => {
     try {
       const response = await axios.get('api/quotationmain/count');
-      setRowCount(response.data.count);
+      setRowCount(response.data);
     } catch (error) {
       console.error('Error fetching row count:', error);
     }
@@ -180,6 +215,11 @@ const BasicInput = ({ setActiveTab }) => {
     setSelectedCustomer(
       customerData.find((customer) => customer.name === selectedOption),
     );
+    const a =
+      selectedOption +
+      '  ' +
+      (selectedCustomer == null ? '' : selectedCustomer);
+    setExportName(a);
   };
 
   // New functions for customer data processing
@@ -225,9 +265,56 @@ const BasicInput = ({ setActiveTab }) => {
     }
   };
 
+  const createCustomer = async () => {
+    try {
+      const customerData = {
+        Name: customerName,
+        SubName: branchName,
+        Address:
+          customerAddressValue === '1'
+            ? `${customerPrefecture} ${customerCity} ${customerOtherAddress}`
+            : customerAddressValue === '2'
+            ? customerAddressLocation
+            : customerOption?.label || '',
+        Phone: customerPhone,
+        Fax: customerFax,
+        Email: customerEmail,
+        Hp: customerWebsite,
+        Description: customerNotes,
+        Rank: customerRank,
+        CloseingDat: customerClosingDate,
+        Group: customerGroup,
+        Creater: userName,
+      };
+
+      const response = await axios.post('/api/customer', customerData);
+      if (response.status === 200) {
+        message.success('Customer created successfully');
+        // Clear the form fields after successful creation
+        setCustomerName('');
+        setBranchName('');
+        setCustomerAddressValue('0');
+        setCustomerPrefecture('');
+        setCustomerCity('');
+        setCustomerOtherAddress('');
+        setCustomerAddressLocation('');
+        setCustomerPhone('');
+        setCustomerFax('');
+        setCustomerEmail('');
+        setCustomerWebsite('');
+        setCustomerNotes('');
+        setCustomerRank('');
+        setCustomerClosingDate('');
+        setCustomerGroup('');
+      }
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      message.error('Failed to create customer');
+    }
+  };
+
   const handleSaveCustomerData = () => {
-    // Implement the logic to save customer data
-    message.success('Customer data saved successfully');
+    createCustomer();
   };
 
   return (
@@ -279,6 +366,7 @@ const BasicInput = ({ setActiveTab }) => {
                     <Input
                       disabled={selectedMainAddressValue !== '1'}
                       allowClear
+                      required
                       className="w-full"
                       onChange={(e) => setMainOtherAddress(e.target.value)}
                     />
@@ -290,7 +378,6 @@ const BasicInput = ({ setActiveTab }) => {
                   </Radio>
                   <div className="flex-grow">
                     <Input
-                      value={mainAddressLocation}
                       onChange={(e) => setMainAddressLocation(e.target.value)}
                       disabled={selectedMainAddressValue !== '2'}
                       placeholder="手動で入力してください。"
@@ -654,16 +741,16 @@ const BasicInput = ({ setActiveTab }) => {
               value={customerGroup}
               onChange={(value) => setCustomerGroup(value)}
               options={[
-                { value: 'ア', label: 'ア' },
-                { value: 'カ', label: 'カ' },
-                { value: 'サ', label: 'サ' },
-                { value: 'タ', label: 'タ' },
-                { value: 'ナ', label: 'ナ' },
-                { value: 'ハ', label: 'ハ' },
-                { value: 'マ', label: 'マ' },
-                { value: 'ヤ', label: 'ヤ' },
-                { value: 'ラ', label: 'ラ' },
-                { value: 'ワ', label: 'ワ' },
+                { value: '1', label: 'ア' },
+                { value: '2', label: 'カ' },
+                { value: '3', label: 'サ' },
+                { value: '4', label: 'タ' },
+                { value: '5', label: 'ナ' },
+                { value: '6', label: 'ハ' },
+                { value: '7', label: 'マ' },
+                { value: '8', label: 'ヤ' },
+                { value: '9', label: 'ラ' },
+                { value: '10', label: 'ワ' },
               ]}
             />
           </Form.Item>
@@ -681,9 +768,7 @@ const BasicInput = ({ setActiveTab }) => {
       <FloatButton
         shape="square"
         type="primary"
-        onClick={() => {
-          setActiveTab('addition');
-        }}
+        onClick={() => sendData()}
         description="次へ"
         className="mb-16 mr-10 animate-bounce"
       />
