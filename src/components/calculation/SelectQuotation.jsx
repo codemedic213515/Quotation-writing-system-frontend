@@ -164,7 +164,7 @@ export function SelectQuotation({ setActiveTab }) {
         onChange={handlePageChange}
         showSizeChanger
         pageSizeOptions={['5', '10', '20', '50']}
-        className="mt-4 text-center"
+        className="mt-4 text-center justify-center"
       />
       <FloatButton
         shape="square"

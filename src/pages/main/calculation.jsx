@@ -31,22 +31,7 @@ export function Calculation() {
       </div>
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4">
-          <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
-            <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
-              {activeTab === `select`
-                ? '明細書選択'
-                : activeTab === 'set'
-                ? '数量 (Net補給率)'
-                : activeTab === 'rank'
-                ? 'ランク（労務単価・現場雑費率・諸経費率)'
-                : activeTab === 'price'
-                ? '部材単価 (乗率・値引率)'
-                : activeTab === 'material'
-                ? '材料消費率'
-                : activeTab === 'other'
-                ? 'その他計算設定'
-                : ''}
-            </div>
+          <div className="mb-10 flex items-center justify-end flex-wrap gap-6">
             <div>
               <Tabs value={activeTab}>
                 <TabsHeader>

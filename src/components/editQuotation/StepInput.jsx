@@ -19,12 +19,51 @@ const StepInput = ({ setActiveTab, number }) => {
     setActiveTab('basic');
   }
 
+  const initialFormData = (data) => {
+    const groupedData = {};
+
+    data.forEach((item) => {
+      // Check if the basic category (Category1) already exists in the grouped data
+      if (!groupedData[item.category1]) {
+        groupedData[item.category1] = {
+          基本工種: item.category1,
+          部分工種: [],
+        };
+      }
+
+      // Prepare the subcategory objects
+      const subItem = {};
+
+      if (item.category2) {
+        subItem['部分工種1'] = item.category2;
+      }
+
+      if (item.category3) {
+        subItem['部分工種2'] = item.category3;
+      }
+
+      // Add the subcategory to the "parts" array under the correct 基本工種
+      groupedData[item.category1].部分工種.push(subItem);
+    });
+
+    // Convert the grouped data into the desired output format
+    const result = {
+      items: Object.values(groupedData),
+    };
+
+    return result;
+  };
   useEffect(() => {
     const fetchQuotationData = async () => {
       try {
         const response = await axios.get(`api/quotationtype?number=${number}`);
         const data = response.data;
         console.log(data);
+
+        const result = initialFormData(data);
+        console.log('result:', result);
+
+        form.setFieldsValue(result);
       } catch (error) {
         console.error('error:', error);
       }
@@ -54,7 +93,6 @@ const StepInput = ({ setActiveTab, number }) => {
 
   // Render Tree Data from the form values
   const renderTreeData = (data) => {
-    console.log(data);
     if (!data || !data.items) return [];
     return data.items.map((item, itemIndex) => ({
       title: `基本工種 ${itemIndex + 1}: ${item?.['基本工種'] || ''}`,
@@ -70,92 +108,83 @@ const StepInput = ({ setActiveTab, number }) => {
   };
 
   // Transform the tree data for API
-  const transformData = () => {
-    const treeData = renderTreeData(form.getFieldsValue());
+  const transformData = (formData) => {
     let result = [];
-    const code = number;
 
-    treeData.forEach((item) => {
-      const category1 = item.title.split(':')[1].trim(); // Extract Category1
+    // Loop over each item (工種)
+    formData.items.forEach((item) => {
+      const category1 = item['基本工種']; // Category1 (基本工種)
 
-      item.children.forEach((subItem) => {
-        const [category2, category3] = subItem.title
-          .split(',')
-          .map((part) => part.split(':')[1]?.trim() || '');
-        const removalRate = subItem.removalRate || ''; // Capture removalRate from subItem
+      // Loop over the 部分工種 (subcategories) to extract data
+      (item['部分工種'] || [`'部分工種1':"", '部分工種2':""`]).forEach(
+        (subItem) => {
+          const category2 = subItem['部分工種1'] || ''; // Category2 (部分工種1) - Default to empty string if not selected
+          const category3 = subItem['部分工種2'] || ''; // Category3 (部分工種2) - Default to empty string if not selected
+
+          // Handle RemovalRate: convert empty strings to null, and keep valid numbers
+          const removalRate = subItem['removalRate']
+            ? parseFloat(subItem['removalRate']) || null
+            : null;
+
+          // Add each entry to the result array
+          result.push({
+            Number: formData.Number || '', // Assuming Number is passed as part of form data
+            Category1: category1 || '',
+            Category2: category2 || '', // Ensure Category2 is empty if not selected
+            Category3: category3 || '', // Ensure Category3 is empty if not selected
+            Category4: '', // Based on your example, Category4 is not used
+            Delete: 0, // Always 0, assuming no delete action is needed
+            RemovalRate: removalRate, // Ensure RemovalRate is correctly handled
+          });
+        },
+      );
+
+      // Handle the case where there are no subcategories (empty '部分工種' list)
+      if (item['部分工種'] && item['部分工種'].length === 0) {
         result.push({
-          Number: code || '',
-          Category1: category1,
-          Category2: category2 || '',
-          Category3: category3 || '',
-          Category4: '', // As per your example, no Category4 specified
-          Delete: 0,
-          RemovalRate: removalRate, // Assign the removalRate from the sub-category
-        });
-      });
-
-      // Handle case where there are no children
-      if (item.children.length === 0) {
-        result.push({
-          Number: code || '',
-          Category1: category1,
-          Category2: '',
-          Category3: '',
+          Number: formData.Number || '',
+          Category1: category1 || '',
+          Category2: '', // Default to empty string if no subcategory
+          Category3: '', // Default to empty string if no subcategory
           Category4: '',
           Delete: 0,
-          RemovalRate: item.removalRate || '', // Use item.removalRate or a default value
+          RemovalRate: item['removalRate']
+            ? parseFloat(item['removalRate']) || null
+            : null, // Handle RemovalRate here too
         });
       }
     });
 
     return result;
   };
+
   const sendData = async () => {
     try {
-      const transformedData = transformData(); // Assume this returns an array of QuotationType
-      console.log('Transformed data:', transformedData);
+      // Get the form data (items)
+      const formData = form.getFieldsValue();
 
-      let allSuccessful = true; // Flag to track if all requests were successful
+      // Transform formData into the structure required by the backend
+      const cleanedData = transformData(formData);
 
-      for (let i = 0; i < transformedData.length; i++) {
-        // Prepare the data in the expected format
-        const dataToSend = {
-          Number: transformedData[i].Number || '',
-          Category1: transformedData[i].Category1 || '',
-          Category2: transformedData[i].Category2 || '',
-          Category3: transformedData[i].Category3 || '',
-          Category4: transformedData[i].Category4 || '',
-          Delete: transformedData[i].Delete === 0, // Convert Delete to boolean
-          RemovalRate: transformedData[i].RemovalRate || 0,
-        };
+      // Prepare the request object
+      const requestData = {
+        Number: number, // Send the current 'number'
+        CleanedData: cleanedData, // Send the transformed data
+      };
 
-        try {
-          // Send each item one by one
-          const response = await axios.post('/api/quotationtype', dataToSend);
+      console.log('Data to be sent:', requestData);
 
-          if (response.status === 200) {
-            console.log(`Create Type Success for item ${i + 1}`);
-          } else {
-            console.error(`Create type failed for item ${i + 1}`);
-            message.error(`Create type failed for item ${i + 1}`);
-            allSuccessful = false; // Set flag to false if any request fails
-          }
-        } catch (error) {
-          console.error(`Error creating type for item ${i + 1}:`, error);
-          message.error(`Create type failed for item ${i + 1}`);
-          allSuccessful = false;
-        }
-      }
+      // Send data to the backend
+      const response = await axios.post('/api/quotationtype/save', requestData);
 
-      // Show appropriate message based on request status
-      if (allSuccessful) {
-        message.success('All types created successfully!');
+      if (response.status === 200) {
+        message.success('Data saved successfully!');
         setActiveTab('material'); // Move to the next tab if successful
       } else {
-        message.warning('Some types failed to create.');
+        message.error('Failed to save data.');
       }
     } catch (error) {
-      message.error('Create type process failed!');
+      message.error('Error saving data');
       console.error('Error:', error);
     }
   };
