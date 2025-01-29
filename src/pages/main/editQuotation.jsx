@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardBody,
@@ -21,6 +21,11 @@ import SelectQuotation from '@/components/editQuotation/SelectQuotation';
 
 export function EditQuotation() {
   const [activeTab, setActiveTab] = useState('select');
+  const [number, setNumber] = useState('');
+
+  useEffect(() => {
+    setActiveTab;
+  }, []);
   return (
     <div>
       <div className="relative mt-8 h-28 w-full overflow-hidden rounded-xl ">
@@ -47,7 +52,10 @@ export function EditQuotation() {
                 <TabsHeader>
                   <Tab
                     value="select"
-                    onClick={() => setActiveTab('select')}
+                    onClick={() => {
+                      setActiveTab('select');
+                      setNumber('');
+                    }}
                     className={`${
                       activeTab === 'select'
                         ? 'active-tab font-bold text-[#00B3F4]'
@@ -112,16 +120,31 @@ export function EditQuotation() {
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
             {activeTab === 'select' && (
-              <SelectQuotation setActiveTab={setActiveTab} />
+              <SelectQuotation
+                setActiveTab={setActiveTab}
+                setNumber={setNumber}
+              />
             )}
             {activeTab === 'basic' && (
-              <BasicInput setActiveTab={setActiveTab} />
+              <BasicInput
+                setActiveTab={setActiveTab}
+                number={number}
+                setNumber={setNumber}
+              />
             )}
             {activeTab === 'addition' && (
-              <AdditionalInput setActiveTab={setActiveTab} />
+              <AdditionalInput setActiveTab={setActiveTab} number={number} />
             )}
-            {activeTab === 'step' && <StepInput setActiveTab={setActiveTab} />}
-            {activeTab === 'material' && <MaterialInput />}
+            {activeTab === 'step' && (
+              <StepInput setActiveTab={setActiveTab} number={number} />
+            )}
+            {activeTab === 'material' && (
+              <MaterialInput
+                setActiveTab={setActiveTab}
+                number={number}
+                setNumber={setNumber}
+              />
+            )}
           </div>
         </CardBody>
       </Card>

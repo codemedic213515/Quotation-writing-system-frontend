@@ -15,31 +15,46 @@ import axios from 'axios';
 const StepInput = ({ setActiveTab, number }) => {
   const [form] = Form.useForm();
   const [options, setOptions] = useState([]);
-
-  // Fetch construction data from API
-  const fetchConstruction = async () => {
-    try {
-      const response = await axios.get('/api/construction');
-      const option = response.data
-        .filter((item) => !item.delete)
-        .map((item) => ({
-          value: item.name,
-          label: item.name,
-          siteMiscell: item.siteMiscell,
-        }));
-      setOptions(option);
-    } catch (error) {
-      console.error('Error fetching constructions:', error);
-      message.error('Failed to fetch construction data');
-    }
-  };
+  if (number == '') {
+    setActiveTab('basic');
+  }
 
   useEffect(() => {
+    const fetchQuotationData = async () => {
+      try {
+        const response = await axios.get(`api/quotationtype?number=${number}`);
+        const data = response.data;
+        console.log(data);
+      } catch (error) {
+        console.error('error:', error);
+      }
+    };
+    const fetchConstruction = async () => {
+      try {
+        const response = await axios.get('/api/construction');
+        const option = response.data
+          .filter((item) => !item.delete)
+          .map((item) => ({
+            value: item.name,
+            label: item.name,
+            siteMiscell: item.siteMiscell,
+          }));
+        setOptions(option);
+      } catch (error) {
+        console.error('Error fetching constructions:', error);
+        message.error('Failed to fetch construction data');
+      }
+    };
+
+    if (number) {
+      fetchQuotationData();
+    }
     fetchConstruction();
-  }, []);
+  }, [number]);
 
   // Render Tree Data from the form values
   const renderTreeData = (data) => {
+    console.log(data);
     if (!data || !data.items) return [];
     return data.items.map((item, itemIndex) => ({
       title: `基本工種 ${itemIndex + 1}: ${item?.['基本工種'] || ''}`,

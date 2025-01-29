@@ -1,10 +1,33 @@
 import { Form, Radio, Input, FloatButton, message } from 'antd';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 const AdditionalInput = ({ setActiveTab, number }) => {
   const [purpose, setPurpose] = useState('');
   const [square, setSquare] = useState('');
   const [method, setMethod] = useState('');
+  if (number == '') {
+    setActiveTab('basic');
+  }
+  useEffect(() => {
+    const fetchQuotationData = async () => {
+      try {
+        const response = await axios.get(`/api/quotationmain`, {
+          params: { code: number },
+        });
+        const data = response.data.data[0];
+
+        setPurpose(data.purpose);
+        setSquare(data.square);
+        setMethod(data.standard);
+      } catch (error) {
+        console.error('error:', error);
+      }
+    };
+
+    if (number) {
+      fetchQuotationData();
+    }
+  }, [number]);
   const saveAddition = async () => {
     const code = number;
 
@@ -29,6 +52,7 @@ const AdditionalInput = ({ setActiveTab, number }) => {
       <Form layout="vertical">
         <Form.Item label="① 建設用途 :">
           <Radio.Group
+            value={purpose}
             className="flex flex-col"
             onChange={(e) => setPurpose(e.target.value)}
           >
@@ -104,12 +128,16 @@ const AdditionalInput = ({ setActiveTab, number }) => {
               type="number"
               addonAfter="m²"
               min={0}
+              value={square}
               step="0.01"
               onChange={(e) => setSquare(e.target.value)}
             />
           </Form.Item>
           <Form.Item label="③ 提出先 :" className="flex flex-row flex-grow">
-            <Radio.Group onChange={(e) => setMethod(e.target.value)}>
+            <Radio.Group
+              onChange={(e) => setMethod(e.target.value)}
+              value={method}
+            >
               <Radio value="提出単価を建設物価基準で計算">
                 提出単価を建設物価基準で計算
               </Radio>

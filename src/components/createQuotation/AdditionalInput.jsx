@@ -5,6 +5,9 @@ const AdditionalInput = ({ setActiveTab, number }) => {
   const [purpose, setPurpose] = useState('');
   const [square, setSquare] = useState('');
   const [method, setMethod] = useState('');
+  if (number == '') {
+    setActiveTab('basic');
+  }
   const saveAddition = async () => {
     const code = number;
 

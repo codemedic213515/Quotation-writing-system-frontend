@@ -20,6 +20,7 @@ import MaterialInput from '@/components/createQuotation/MaterialInput';
 export function CreateQuotation() {
   const [activeTab, setActiveTab] = useState('basic');
   const [number, setNumber] = useState('');
+
   useEffect(() => {
     setActiveTab;
   }, []);
@@ -45,54 +46,119 @@ export function CreateQuotation() {
             <div className="text-lg">
               <Tabs value={activeTab}>
                 <TabsHeader>
-                  <Tab
-                    value="basic"
-                    onClick={() => setActiveTab('basic')}
-                    className={
-                      activeTab === 'basic'
-                        ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'text-blue-gray-500 font-bold'
-                    }
-                  >
-                    <DocumentTextIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    基本入力
-                  </Tab>
-                  <Tab
-                    value="addition"
-                    onClick={() => setActiveTab('addition')}
-                    className={
-                      activeTab === 'addition'
-                        ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
-                  >
-                    <SquaresPlusIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
-                    詳細入力
-                  </Tab>
-                  <Tab
-                    value="step"
-                    onClick={() => setActiveTab('step')}
-                    className={
-                      activeTab === 'step'
-                        ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
-                  >
-                    <ArrowPathRoundedSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    工種入力
-                  </Tab>
-                  <Tab
-                    value="material"
-                    onClick={() => setActiveTab('material')}
-                    className={
-                      activeTab === 'material'
-                        ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    }
-                  >
-                    <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    部材入力
-                  </Tab>
+                  {activeTab === 'basic' ? (
+                    <Tab
+                      value="basic"
+                      onClick={() => setActiveTab('basic')}
+                      className={
+                        activeTab === 'basic'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'text-blue-gray-500 font-bold'
+                      }
+                    >
+                      <DocumentTextIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      基本入力
+                    </Tab>
+                  ) : (
+                    <Tab
+                      value="basic"
+                      disabled
+                      onClick={() => setActiveTab('basic')}
+                      className={
+                        activeTab === 'basic'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'text-blue-gray-500 font-bold'
+                      }
+                    >
+                      <DocumentTextIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      基本入力
+                    </Tab>
+                  )}
+
+                  {activeTab === 'addition' ? (
+                    <Tab
+                      value="addition"
+                      onClick={() => setActiveTab('addition')}
+                      className={
+                        activeTab === 'addition'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <SquaresPlusIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
+                      詳細入力
+                    </Tab>
+                  ) : (
+                    <Tab
+                      value="addition"
+                      disabled
+                      onClick={() => setActiveTab('addition')}
+                      className={
+                        activeTab === 'addition'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <SquaresPlusIcon className="-mt-0.5 mr-2 inline-block h-5 w-5" />
+                      詳細入力
+                    </Tab>
+                  )}
+                  {activeTab === 'step' ? (
+                    <Tab
+                      value="step"
+                      onClick={() => setActiveTab('step')}
+                      className={
+                        activeTab === 'step'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <ArrowPathRoundedSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      工種入力
+                    </Tab>
+                  ) : (
+                    <Tab
+                      value="step"
+                      disabled
+                      onClick={() => setActiveTab('step')}
+                      className={
+                        activeTab === 'step'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <ArrowPathRoundedSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      工種入力
+                    </Tab>
+                  )}
+                  {activeTab === 'material' ? (
+                    <Tab
+                      value="material"
+                      onClick={() => setActiveTab('material')}
+                      className={
+                        activeTab === 'material'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      部材入力
+                    </Tab>
+                  ) : (
+                    <Tab
+                      value="material"
+                      disabled
+                      onClick={() => setActiveTab('material')}
+                      className={
+                        activeTab === 'material'
+                          ? 'active-tab font-bold text-[#00B3F4]'
+                          : 'font-bold text-blue-gray-500'
+                      }
+                    >
+                      <CubeTransparentIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                      部材入力
+                    </Tab>
+                  )}
                 </TabsHeader>
               </Tabs>
             </div>
@@ -100,7 +166,11 @@ export function CreateQuotation() {
           {/* Render Content Based on Active Tab */}
           <div className="tab-content">
             {activeTab === 'basic' && (
-              <BasicInput setActiveTab={setActiveTab} setNumber={setNumber} />
+              <BasicInput
+                setActiveTab={setActiveTab}
+                number={number}
+                setNumber={setNumber}
+              />
             )}
             {activeTab === 'addition' && (
               <AdditionalInput setActiveTab={setActiveTab} number={number} />
@@ -108,7 +178,13 @@ export function CreateQuotation() {
             {activeTab === 'step' && (
               <StepInput setActiveTab={setActiveTab} number={number} />
             )}
-            {activeTab === 'material' && <MaterialInput number={number} />}
+            {activeTab === 'material' && (
+              <MaterialInput
+                setActiveTab={setActiveTab}
+                number={number}
+                setNumber={setNumber}
+              />
+            )}
           </div>
         </CardBody>
       </Card>

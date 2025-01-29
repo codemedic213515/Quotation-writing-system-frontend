@@ -12,18 +12,14 @@ import {
 } from 'antd';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import moment from 'moment';
 
 const { TextArea } = Input;
 
-const BasicInput = ({ setActiveTab, setNumber }) => {
-  // Existing state
+const BasicInput = ({ setActiveTab, number }) => {
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mainName, setMainName] = useState('');
   const [userName, setUserName] = useState('');
-  const [userCode, setUserCode] = useState('');
-  const [quotationMark, setQuotationMark] = useState('');
   const token = localStorage.getItem('token');
   const [prefectures, setPrefectures] = useState([]);
   const [cities, setCities] = useState([]);
@@ -32,7 +28,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
   const [selectedMainPrefecture, setSelectedMainPrefecture] = useState('');
   const [selectedMainCity, setSelectedMainCity] = useState('');
   const [selectedMain, setSelectedMain] = useState(null);
-  const [rowCount, setRowCount] = useState('');
+  const [subName, setSubName] = useState('');
   const [selectedExportRadio, setSelectedExportRadio] = useState('');
   const [selectedMainExportName, setSelectedMainExportName] = useState('');
   const [customerData, setCustomerData] = useState([]);
@@ -57,25 +53,68 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
   const [customerClosingDate, setCustomerClosingDate] = useState('');
   const [customerGroup, setCustomerGroup] = useState('');
 
-  // Existing functions
+  if (number === '') {
+    message.info('Plz select the Quotation');
+    setActiveTab('select');
+  }
 
-  const NumberDisplay = ({ number }) => {
-    const formattedNumber = ((number ?? 0) + 1).toString().padStart(4, '0');
+  useEffect(() => {
+    const fetchQuotationData = async () => {
+      try {
+        const response = await axios.get(`/api/quotationmain`, {
+          params: { code: number },
+        });
+        const data = response.data.data[0];
+        const result = data.export.split(/\s+/);
+
+        // Access the individual parts
+        const part1 = result[0]; // "akitaken"
+        const part2 = result[1];
+        setMainName(data.name);
+        setSelectedMainAddressValue('2');
+        setMainAddressLocation(data.address);
+        setSelectedExportRadio('type');
+        setSelectedMainExportName(part1);
+        setSubName(part2);
+        setMainImport(data.import);
+      } catch (error) {
+        console.error('error:', error);
+      }
+    };
+    const fetchPrefectures = async () => {
+      try {
+        const response = await axios.get('/api/prefecture');
+        const filteredPrefectures = response.data
+          .filter((item) => !item.delete)
+          .map((item) => ({
+            value: item.name,
+            label: item.name,
+          }));
+        setPrefectures(filteredPrefectures);
+      } catch (error) {
+        console.error('Error fetching prefectures:', error);
+        message.error('Failed to fetch prefectures');
+      }
+    };
+    if (number) {
+      fetchQuotationData();
+    }
+    fetchPrefectures();
+  }, [number]);
+
+  const NumberDisplay = () => {
     const decodedPayload = jwtDecode(token);
     const decodedName = decodedPayload.name;
-    const decodedCode = decodedPayload.nameid;
+
     setUserName(decodedName);
-    setUserCode(decodedCode);
-    const dayNumber = moment().format('YYMMDD');
-    const quotationNumber = userCode + dayNumber + formattedNumber;
-    setQuotationMark(quotationNumber);
+
     return (
       <div className="flex flex-row justify-start gap-10 mb-4">
         <p>
-          作成者名 :<i className="text-blue-500">{userName}</i>
+          作成者名 : <i className="text-blue-500">{userName}</i>
         </p>
         <p>
-          見積番号 : <i className=" text-green-500">{quotationNumber}</i>
+          見積番号 : <i className=" text-green-500">{number}</i>
         </p>
       </div>
     );
@@ -95,47 +134,26 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
   const setSelectedMainExportSubName = (e) => {
     const a = selectedMainExportName + '  ' + e;
     setExportName(a);
+    setSubName(e);
   };
 
   const sendData = async () => {
     const data = {
-      Code: quotationMark,
+      Code: number,
       Creater: userName,
       Name: mainName,
       Address: quotationAddress,
       Export: exportName,
       Import: mainImport,
     };
-    const response = await axios.post('/api/quotationmain', data);
+    const response = await axios.put(`/api/quotationmain/${number}`, data);
     if (response.status === 200) {
-      setNumber(quotationMark);
       setActiveTab('addition');
       message.success('Create Quotation Success!');
       console.log(response);
     } else {
       console.log(response);
       message.error('Failed create Quotation');
-    }
-  };
-
-  useEffect(() => {
-    fetchPrefectures();
-    fetchRowCount();
-  }, []);
-
-  const fetchPrefectures = async () => {
-    try {
-      const response = await axios.get('/api/prefecture');
-      const filteredPrefectures = response.data
-        .filter((item) => !item.delete)
-        .map((item) => ({
-          value: item.name,
-          label: item.name,
-        }));
-      setPrefectures(filteredPrefectures);
-    } catch (error) {
-      console.error('Error fetching prefectures:', error);
-      message.error('Failed to fetch prefectures');
     }
   };
 
@@ -190,15 +208,6 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
 
   const radioExportChange = (e) => {
     setSelectedExportRadio(e.target.value);
-  };
-
-  const fetchRowCount = async () => {
-    try {
-      const response = await axios.get('api/quotationmain/count');
-      setRowCount(response.data);
-    } catch (error) {
-      console.error('Error fetching row count:', error);
-    }
   };
 
   const fetchExportData = async (e) => {
@@ -319,7 +328,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
-      <NumberDisplay number={rowCount} />
+      <NumberDisplay />
       <Form
         layout="vertical"
         className="border border-t-0 border-x-0 border-b-[#000000b8]"
@@ -382,6 +391,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
                       disabled={selectedMainAddressValue !== '2'}
                       placeholder="手動で入力してください。"
                       allowClear
+                      value={quotationAddress}
                       className="w-full"
                     />
                   </div>
@@ -434,6 +444,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
                       <Input
                         placeholder="得意先名"
                         allowClear
+                        value={selectedMainExportName}
                         disabled={selectedExportRadio !== 'type'}
                         className="w-full"
                         onChange={(e) =>
@@ -444,6 +455,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
                     <Input
                       placeholder="支社名"
                       allowClear
+                      value={subName}
                       onChange={(e) =>
                         setSelectedMainExportSubName(e.target.value)
                       }
@@ -517,7 +529,10 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
               </Radio.Group>
             </Form.Item>
             <Form.Item label="④ 仕入先 : " required>
-              <Input onChange={(e) => setMainImport(e.target.value)} />
+              <Input
+                onChange={(e) => setMainImport(e.target.value)}
+                value={mainImport}
+              />
             </Form.Item>
           </div>
         </div>
@@ -642,7 +657,6 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
                           handleCustomerPostalSearch(e.target.value); // Trigger search on Enter
                         }
                       }}
-                      onChange={(value) => setSelectedCustomerOption(value)} // Update the selected value
                       allowClear
                       notFoundContent={
                         loading ? (

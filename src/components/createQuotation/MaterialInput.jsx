@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import axios from 'axios';
 
-const MaterialInput = ({ number }) => {
+const MaterialInput = ({ setActiveTab, number, setNumber }) => {
   const [form] = Form.useForm();
   const [quotationData, setQuotationData] = useState([]);
   const [category1Option, setCategory1Option] = useState([]);
@@ -23,6 +23,9 @@ const MaterialInput = ({ number }) => {
   const [unitOption, setUnitOption] = useState([]);
   const [categoryOption, setCategoryOption] = useState([]);
   // Fetch quotationTypes based on number
+  if (number == '') {
+    setActiveTab('basic');
+  }
   const fetchQuotationData = async () => {
     try {
       const response = await axios.get(`api/quotationtype?number=${number}`);
@@ -244,12 +247,8 @@ const MaterialInput = ({ number }) => {
   const handleSubmit = async () => {
     try {
       const formValues = form.getFieldsValue(); // Raw data from the form
-      const transformedData = transformData(formValues); // Transform data into required format
-
+      const transformedData = transformData(formValues);
       console.log('Transformed Data:', transformedData);
-
-      // Use Promise.all to send requests one by one
-
       const response = await axios.post(
         '/api/quotationmaterial',
         transformedData,
@@ -257,8 +256,8 @@ const MaterialInput = ({ number }) => {
       if (response.status !== 200) {
         throw new Error(`Failed to save data for typeId: ${data.typeId}`);
       }
-
       message.success('All data saved successfully!');
+      setNumber('');
     } catch (error) {
       console.error('Error saving data:', error);
       message.error('Error saving data');

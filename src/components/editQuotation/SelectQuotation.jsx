@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export function SelectQuotation({ setActiveTab }) {
+export function SelectQuotation({ setActiveTab, setNumber }) {
   const [quotations, setQuotations] = useState([]);
   const [users, setUsers] = useState([]); // State to store users for filtering
   const [loading, setLoading] = useState(false);
@@ -105,8 +105,9 @@ export function SelectQuotation({ setActiveTab }) {
   };
 
   const handleEdit = (quotation) => {
-    setActiveTab('basic'); // Set the active tab to "basic"
-    // You can also send the `quotation.code` or `quotation` object to the edit page, depending on your app's flow
+    setNumber(quotation.code);
+    setActiveTab('basic');
+
     console.log('Editing quotation:', quotation);
   };
 

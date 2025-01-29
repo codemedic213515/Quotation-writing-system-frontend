@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import axios from 'axios';
 
-const MaterialInput = ({ number }) => {
+const MaterialInput = ({ setActiveTab, number, setNumber }) => {
   const [form] = Form.useForm();
   const [quotationData, setQuotationData] = useState([]);
   const [category1Option, setCategory1Option] = useState([]);
@@ -23,6 +23,9 @@ const MaterialInput = ({ number }) => {
   const [unitOption, setUnitOption] = useState([]);
   const [categoryOption, setCategoryOption] = useState([]);
   // Fetch quotationTypes based on number
+  if (number == '') {
+    setActiveTab('basic');
+  }
   const fetchQuotationData = async () => {
     try {
       const response = await axios.get(`api/quotationtype?number=${number}`);
@@ -257,7 +260,7 @@ const MaterialInput = ({ number }) => {
       if (response.status !== 200) {
         throw new Error(`Failed to save data for typeId: ${data.typeId}`);
       }
-
+      setNumber('');
       message.success('All data saved successfully!');
     } catch (error) {
       console.error('Error saving data:', error);

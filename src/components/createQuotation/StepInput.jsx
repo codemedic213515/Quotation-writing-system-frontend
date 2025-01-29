@@ -15,7 +15,9 @@ import axios from 'axios';
 const StepInput = ({ setActiveTab, number }) => {
   const [form] = Form.useForm();
   const [options, setOptions] = useState([]);
-
+  if (number == '') {
+    setActiveTab('basic');
+  }
   // Fetch construction data from API
   const fetchConstruction = async () => {
     try {
