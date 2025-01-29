@@ -16,7 +16,7 @@ import moment from 'moment';
 
 const { TextArea } = Input;
 
-const BasicInput = ({ setActiveTab, setNumber }) => {
+const BasicInput = ({ setActiveTab, number, setNumber }) => {
   // Existing state
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -57,30 +57,32 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
   const [customerClosingDate, setCustomerClosingDate] = useState('');
   const [customerGroup, setCustomerGroup] = useState('');
 
-  // Existing functions
-
-  const NumberDisplay = ({ number }) => {
-    const formattedNumber = ((number ?? 0) + 1).toString().padStart(4, '0');
+  useEffect(() => {
+    fetchPrefectures();
+    fetchRowCount();
+  }, []);
+  const NumberDisplay = () => {
     const decodedPayload = jwtDecode(token);
     const decodedName = decodedPayload.name;
     const decodedCode = decodedPayload.nameid;
     setUserName(decodedName);
     setUserCode(decodedCode);
+    const formattedNumber = (rowCount + 1).toString().padStart(4, '0');
     const dayNumber = moment().format('YYMMDD');
     const quotationNumber = userCode + dayNumber + formattedNumber;
     setQuotationMark(quotationNumber);
+    setNumber(quotationMark);
     return (
       <div className="flex flex-row justify-start gap-10 mb-4">
         <p>
-          作成者名 :<i className="text-blue-500">{userName}</i>
+          作成者名 : <i className="text-blue-500">{userName}</i>
         </p>
         <p>
-          見積番号 : <i className=" text-green-500">{quotationNumber}</i>
+          見積番号 : <i className=" text-green-500">{quotationMark}</i>
         </p>
       </div>
     );
   };
-
   const handleMainAddressRadioChange = (e) => {
     setSelectedMainAddressValue(e.target.value);
   };
@@ -108,7 +110,6 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
     };
     const response = await axios.post('/api/quotationmain', data);
     if (response.status === 200) {
-      setNumber(quotationMark);
       setActiveTab('addition');
       message.success('Create Quotation Success!');
       console.log(response);
@@ -117,11 +118,6 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
       message.error('Failed create Quotation');
     }
   };
-
-  useEffect(() => {
-    fetchPrefectures();
-    fetchRowCount();
-  }, []);
 
   const fetchPrefectures = async () => {
     try {
@@ -319,7 +315,7 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
-      <NumberDisplay number={rowCount} />
+      <NumberDisplay />
       <Form
         layout="vertical"
         className="border border-t-0 border-x-0 border-b-[#000000b8]"
@@ -642,7 +638,6 @@ const BasicInput = ({ setActiveTab, setNumber }) => {
                           handleCustomerPostalSearch(e.target.value); // Trigger search on Enter
                         }
                       }}
-                      onChange={(value) => setSelectedCustomerOption(value)} // Update the selected value
                       allowClear
                       notFoundContent={
                         loading ? (
