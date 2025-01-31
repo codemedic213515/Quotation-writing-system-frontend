@@ -23,7 +23,6 @@ const StepInput = ({ setActiveTab, number }) => {
     const groupedData = {};
 
     data.forEach((item) => {
-      // Check if the basic category (Category1) already exists in the grouped data
       if (!groupedData[item.category1]) {
         groupedData[item.category1] = {
           基本工種: item.category1,
@@ -31,7 +30,6 @@ const StepInput = ({ setActiveTab, number }) => {
         };
       }
 
-      // Prepare the subcategory objects
       const subItem = {};
 
       if (item.category2) {
@@ -42,11 +40,9 @@ const StepInput = ({ setActiveTab, number }) => {
         subItem['部分工種2'] = item.category3;
       }
 
-      // Add the subcategory to the "parts" array under the correct 基本工種
       groupedData[item.category1].部分工種.push(subItem);
     });
 
-    // Convert the grouped data into the desired output format
     const result = {
       items: Object.values(groupedData),
     };
@@ -91,7 +87,6 @@ const StepInput = ({ setActiveTab, number }) => {
     fetchConstruction();
   }, [number]);
 
-  // Render Tree Data from the form values
   const renderTreeData = (data) => {
     if (!data || !data.items) return [];
     return data.items.map((item, itemIndex) => ({
@@ -102,55 +97,48 @@ const StepInput = ({ setActiveTab, number }) => {
           subItem?.['部分工種2'] || ''
         }`,
         key: `item-${itemIndex}-part-${subIndex}`,
-        removalRate: item?.siteMiscell || '', // Access siteMiscell from the item, not subItem
+        removalRate: item?.siteMiscell || '',
       })),
     }));
   };
 
-  // Transform the tree data for API
   const transformData = (formData) => {
     let result = [];
 
-    // Loop over each item (工種)
     formData.items.forEach((item) => {
-      const category1 = item['基本工種']; // Category1 (基本工種)
-
-      // Loop over the 部分工種 (subcategories) to extract data
+      const category1 = item['基本工種'];
       (item['部分工種'] || [`'部分工種1':"", '部分工種2':""`]).forEach(
         (subItem) => {
-          const category2 = subItem['部分工種1'] || ''; // Category2 (部分工種1) - Default to empty string if not selected
-          const category3 = subItem['部分工種2'] || ''; // Category3 (部分工種2) - Default to empty string if not selected
+          const category2 = subItem['部分工種1'] || '';
+          const category3 = subItem['部分工種2'] || '';
 
-          // Handle RemovalRate: convert empty strings to null, and keep valid numbers
           const removalRate = subItem['removalRate']
             ? parseFloat(subItem['removalRate']) || null
             : null;
 
-          // Add each entry to the result array
           result.push({
-            Number: formData.Number || '', // Assuming Number is passed as part of form data
+            Number: formData.Number || '',
             Category1: category1 || '',
-            Category2: category2 || '', // Ensure Category2 is empty if not selected
-            Category3: category3 || '', // Ensure Category3 is empty if not selected
-            Category4: '', // Based on your example, Category4 is not used
-            Delete: 0, // Always 0, assuming no delete action is needed
-            RemovalRate: removalRate, // Ensure RemovalRate is correctly handled
+            Category2: category2 || '',
+            Category3: category3 || '',
+            Category4: '',
+            Delete: 0,
+            RemovalRate: removalRate,
           });
         },
       );
 
-      // Handle the case where there are no subcategories (empty '部分工種' list)
       if (item['部分工種'] && item['部分工種'].length === 0) {
         result.push({
           Number: formData.Number || '',
           Category1: category1 || '',
-          Category2: '', // Default to empty string if no subcategory
-          Category3: '', // Default to empty string if no subcategory
+          Category2: '',
+          Category3: '',
           Category4: '',
           Delete: 0,
           RemovalRate: item['removalRate']
             ? parseFloat(item['removalRate']) || null
-            : null, // Handle RemovalRate here too
+            : null,
         });
       }
     });
@@ -160,26 +148,22 @@ const StepInput = ({ setActiveTab, number }) => {
 
   const sendData = async () => {
     try {
-      // Get the form data (items)
       const formData = form.getFieldsValue();
 
-      // Transform formData into the structure required by the backend
       const cleanedData = transformData(formData);
 
-      // Prepare the request object
       const requestData = {
-        Number: number, // Send the current 'number'
-        CleanedData: cleanedData, // Send the transformed data
+        Number: number,
+        CleanedData: cleanedData,
       };
 
       console.log('Data to be sent:', requestData);
 
-      // Send data to the backend
       const response = await axios.post('/api/quotationtype/save', requestData);
 
       if (response.status === 200) {
         message.success('Data saved successfully!');
-        setActiveTab('material'); // Move to the next tab if successful
+        setActiveTab('material');
       } else {
         message.error('Failed to save data.');
       }
