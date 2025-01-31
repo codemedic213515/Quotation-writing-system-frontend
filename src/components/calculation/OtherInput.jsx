@@ -1,16 +1,90 @@
-import { Form, InputNumber, Radio, FloatButton, Modal } from 'antd';
-export function OtherInput() {
+import React, { useState, useEffect } from 'react';
+import {
+  Form,
+  InputNumber,
+  Radio,
+  FloatButton,
+  Modal,
+  notification,
+} from 'antd';
+import axios from 'axios';
+
+export function OtherInput({ setActiveTab, number }) {
+  const [formData, setFormData] = useState({
+    pipeAccessoryRate: 0,
+    pipeSupportRate: 0,
+    cableRackAccessoryRate: 0,
+    cableRackSupportRate: 0,
+    racewayAccessoryRate: 0,
+    racewaySupportRate: 0,
+    cableAdditionalRate: 0,
+    lightingAdditionalRate: 0,
+    panelAdditionalRate: 0,
+    performAuxiliaryWorks: true,
+    auxiliaryWorkRate: 0,
+    overheadRate: 0,
+    costRate: 0,
+  });
+
+  useEffect(() => {
+    if (number) {
+      axios
+        .get(`/api/calculation/${number}`)
+        .then((response) => {
+          setFormData(response.data);
+        })
+        .catch((error) => {
+          notification.error({
+            message: 'Error fetching data',
+            description:
+              error.response?.data?.message || 'Something went wrong',
+          });
+        });
+    } else {
+      setActiveTab('select');
+    }
+  }, [number]);
+
+  const handleChange = (field, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    axios
+      .put(`/api/calculation/${number}`, formData)
+      .then(() => {
+        notification.success({
+          message: 'Data updated successfully',
+        });
+      })
+      .catch((error) => {
+        notification.error({
+          message: 'Error updating data',
+          description: error.response?.data?.message || 'Something went wrong',
+        });
+      });
+  };
+
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
       <Form className="mx-auto w-3/4">
         <Form.Item label="配管付属品の計算方法は">
-          <Radio.Group defaultValue={1} className="flex items-center">
+          <Radio.Group
+            value={formData.pipeAccessoryRate}
+            onChange={(e) => handleChange('pipeAccessoryRate', e.target.value)}
+            className="flex items-center"
+          >
             <Radio value={1}>
               <InputNumber
                 addonAfter="%"
                 addonBefore="自動"
                 min={0}
                 max={100}
+                value={formData.pipeAccessoryRate}
+                onChange={(value) => handleChange('pipeAccessoryRate', value)}
                 className="w-36"
               />
             </Radio>

@@ -3,7 +3,13 @@ import { Table, InputNumber, Radio, Select, Form, FloatButton } from 'antd';
 
 const { Option } = Select;
 
-export function MaterialInput() {
+export function MaterialInput({ setActiveTab, number }) {
+  if (number == '') {
+    setActiveTab('select');
+  }
+  const sendData = () => {
+    setActiveTab('other');
+  };
   const [data, setData] = useState([
     {
       key: '1',
@@ -99,9 +105,8 @@ export function MaterialInput() {
             className="items-center flex flex-row gap-4"
             defaultValue="aaa"
           >
-            <Radio value="aaa">工種ごと</Radio>
-            <Radio value="bbb">部材ごと</Radio>
-            <Radio value="ccc">
+            <Radio value="aaa">工種ごとの部材ごと</Radio>
+            <Radio value="bbb">
               <div className="flex flex-row gap-2 items-center">
                 <p>労務費基準:</p>
                 <InputNumber
@@ -149,6 +154,7 @@ export function MaterialInput() {
       <FloatButton
         shape="square"
         type="primary"
+        onClick={() => sendData()}
         description="次へ"
         className="mb-16 mr-10 animate-bounce"
       />

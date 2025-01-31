@@ -1,59 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   Input,
   InputNumber,
   Button,
-  Select,
   FloatButton,
   Radio,
   Form,
 } from 'antd';
+import axios from 'axios';
+export function RankInput({ setActiveTab, number }) {
+  const [data, setData] = useState([]);
+  const [minority, setMinority] = useState(false);
+  const [selectedRow, setSelectedRow] = useState([]);
+  const fetchRankMaster = async () => {
+    try {
+      const response = await axios.get('/api/rank');
+      const updatedData = response.data.map((item) => {
+        const { id, ...rest } = item; // Destructure to remove `id`
+        return { key: id, ...rest }; // Add `key` and rest of the properties
+      });
 
-const { Option } = Select;
-export function RankInput() {
-  const [data, setData] = useState([
-    {
-      key: '1',
-      rank: 'A',
-      laborRateA: 12000,
-      laborRateB: 7000,
-      fieldRate: 3,
-      miscRate: 10,
-    },
-    {
-      key: '2',
-      rank: 'B',
-      laborRateA: 12000,
-      laborRateB: 10000,
-      fieldRate: 3,
-      miscRate: 10,
-    },
-    {
-      key: '3',
-      rank: 'C',
-      laborRateA: 9000,
-      laborRateB: 7000,
-      fieldRate: 2,
-      miscRate: 10,
-    },
-    {
-      key: '4',
-      rank: 'D',
-      laborRateA: 16000,
-      laborRateB: 12000,
-      fieldRate: 2,
-      miscRate: 8,
-    },
-    {
-      key: '5',
-      rank: 'E',
-      laborRateA: 18000,
-      laborRateB: 14000,
-      fieldRate: 3,
-      miscRate: 10,
-    },
-  ]);
+      setData(updatedData);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRankMaster();
+  }, []);
+  if (number == '') {
+    setActiveTab('select');
+  }
+  const sendData = () => {
+    setActiveTab('price');
+  };
 
   const [selectedRowKey, setSelectedRowKey] = useState(null);
 
@@ -69,28 +52,28 @@ export function RankInput() {
 
   const handleRowSelect = (record) => {
     setSelectedRowKey(record.key);
+    setSelectedRow(record);
   };
+  console.log(selectedRow);
 
   const columns = [
     {
       title: 'ランク',
-      dataIndex: 'rank',
-      key: 'rank',
+      dataIndex: 'name',
+      key: 'name',
       align: 'center',
     },
     {
       title: '労務単価A',
-      dataIndex: 'laborRateA',
-      key: 'laborRateA',
+      dataIndex: 'laborCostA',
+      key: 'laborCostA',
       align: 'center',
       render: (text, record) => (
-        <Input
-          value={record.laborRateA}
+        <InputNumber
+          value={record.laborCostA}
           addonAfter={'円'}
           min={0}
-          onChange={(e) =>
-            handleInputChange(record.key, 'laborRateA', e.target.value)
-          }
+          onChange={(e) => handleInputChange(record.key, 'laborCostA', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -98,17 +81,15 @@ export function RankInput() {
     },
     {
       title: '労務単価B',
-      dataIndex: 'laborRateB',
-      key: 'laborRateB',
+      dataIndex: 'laborCostB',
+      key: 'laborCostB',
       align: 'center',
       render: (text, record) => (
-        <Input
-          value={record.laborRateB}
+        <InputNumber
+          value={record.laborCostB}
           addonAfter={'円'}
           min={0}
-          onChange={(e) =>
-            handleInputChange(record.key, 'laborRateB', e.target.value)
-          }
+          onChange={(e) => handleInputChange(record.key, 'laborCostB', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -116,16 +97,16 @@ export function RankInput() {
     },
     {
       title: '現場雑率',
-      dataIndex: 'fieldRate',
-      key: 'fieldRate',
+      dataIndex: 'siteMiscell',
+      key: 'siteMiscell',
       align: 'center',
       render: (text, record) => (
         <InputNumber
-          value={record.fieldRate}
+          value={record.siteMiscell}
           addonAfter="%"
           min={0}
           max={100}
-          onChange={(e) => handleInputChange(record.key, 'fieldRate', e)}
+          onChange={(e) => handleInputChange(record.key, 'siteMiscell', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -133,26 +114,39 @@ export function RankInput() {
     },
     {
       title: '諸経率',
-      dataIndex: 'miscRate',
-      key: 'miscRate',
+      dataIndex: 'otherExpens',
+      key: 'otherExpens',
       align: 'center',
       render: (text, record) => (
         <InputNumber
           addonAfter="%"
           min={0}
           max={100}
-          value={record.miscRate}
-          onChange={(e) => handleInputChange(record.key, 'miscRate', e)}
+          value={record.otherExpens}
+          onChange={(e) => handleInputChange(record.key, 'otherExpens', e)}
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
       ),
     },
   ];
-
+  const updateRankPost = async (updatedRow) => {
+    try {
+      const response = await axios.put(
+        `/api/rank/${updatedRow.id}`,
+        updatedRow,
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleUpdate = () => {
     if (selectedRowKey) {
-      const updatedRow = data.find((item) => item.key === selectedRowKey);
+      const updatedRow = data.find((item) => item.id === selectedRowKey);
+
+      setSelectedRow(updatedRow);
+      updateRankPost(updatedData);
       console.log('Updated row:', updatedRow);
     } else {
       console.log('No row selected for update.');
@@ -160,7 +154,7 @@ export function RankInput() {
   };
 
   return (
-    <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
+    <div className="p-2 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
       <p>
         下記の一覧からランクを設定するか、下記のテキストボックスにて直接入力することができます。
       </p>
@@ -170,11 +164,14 @@ export function RankInput() {
           <Table
             columns={columns}
             dataSource={data}
-            pagination={false}
+            pagination={{
+              position: ['bottomcenter'],
+              pageSize: 5,
+            }}
             bordered
-            className="mb-4 border-collapse"
+            className="mb-0 border-collapse"
             rowClassName={(record) =>
-              record.key === selectedRowKey ? 'bg-blue-100' : ''
+              record.name === selectedRowKey ? 'bg-blue-100' : ''
             }
             onRow={(record) => ({
               onClick: () => handleRowSelect(record),
@@ -192,7 +189,10 @@ export function RankInput() {
             </Button>
           </Form.Item>
           <Form.Item label="労務費の端数を">
-            <Radio.Group defaultValue={false}>
+            <Radio.Group
+              value={minority}
+              onChange={(e) => setMinority(e.target.value)}
+            >
               <Radio value={false}>切り捨てる。</Radio>
               <Radio value={true}>雑材消耗に加算する。</Radio>
             </Radio.Group>
@@ -202,6 +202,7 @@ export function RankInput() {
       <FloatButton
         shape="square"
         type="primary"
+        onClick={() => sendData()}
         description="次へ"
         className="mb-16 mr-10 animate-bounce"
       />
