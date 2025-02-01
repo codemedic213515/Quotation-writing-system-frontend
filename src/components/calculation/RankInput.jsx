@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  Input,
-  InputNumber,
-  Button,
-  FloatButton,
-  Radio,
-  Form,
-} from 'antd';
+import { Table, InputNumber, Button, FloatButton, Radio, Form } from 'antd';
 import axios from 'axios';
+
 export function RankInput({ setActiveTab, number }) {
   const [data, setData] = useState([]);
   const [minority, setMinority] = useState(false);
-  const [selectedRow, setSelectedRow] = useState([]);
+  const [selectedRowKey, setSelectedRowKey] = useState(null);
+
+  // Fetch Rank Data from Backend
   const fetchRankMaster = async () => {
     try {
       const response = await axios.get('/api/rank');
@@ -20,26 +15,44 @@ export function RankInput({ setActiveTab, number }) {
         const { id, ...rest } = item; // Destructure to remove `id`
         return { key: id, ...rest }; // Add `key` and rest of the properties
       });
-
       setData(updatedData);
       console.log(response.data);
     } catch (error) {
-      console.log(error);
+      console.error('Error fetching rank data:', error);
     }
   };
 
   useEffect(() => {
     fetchRankMaster();
   }, []);
-  if (number == '') {
+
+  // Check for empty number and set active tab
+  if (number === '') {
     setActiveTab('select');
   }
-  const sendData = () => {
-    setActiveTab('price');
+
+  // Send Data for Next Tab (Quotation Calculation)
+  const sendData = async () => {
+    try {
+      const selected = data.find((item) => item.key === selectedRowKey);
+      console.log(selected);
+      const { key, name, siteMiscell, otherExpens, ...rest } = selected;
+      const convertedData = {
+        number: number,
+        rank: name,
+        siteMiscellRate: siteMiscell,
+        miscellRate: otherExpens,
+        ...rest,
+      };
+      const response = await axios.post('/api/quotationcalc', convertedData);
+      console.log('Data sent for quotation calculation:', response);
+      setActiveTab('price');
+    } catch (error) {
+      console.error('Error sending data for quotation calculation:', error);
+    }
   };
 
-  const [selectedRowKey, setSelectedRowKey] = useState(null);
-
+  // Handle input changes in the table
   const handleInputChange = (key, field, value) => {
     const newData = data.map((item) => {
       if (item.key === key) {
@@ -50,11 +63,35 @@ export function RankInput({ setActiveTab, number }) {
     setData(newData);
   };
 
+  // Handle Row Selection
   const handleRowSelect = (record) => {
     setSelectedRowKey(record.key);
-    setSelectedRow(record);
+    console.log('Selected Row:', record);
   };
-  console.log(selectedRow);
+
+  // Update Rank Master Data in Backend
+  const updateRankPost = async (data) => {
+    const { key, ...rest } = data;
+    const aa = { id: key, ...rest };
+
+    try {
+      const response = await axios.put(`/api/rank/${aa.id}`, aa);
+      console.log('Updated Row Response:', response);
+    } catch (error) {
+      console.error('Error updating rank data:', error);
+    }
+  };
+
+  // Handle update button click
+  const handleUpdate = () => {
+    if (selectedRowKey) {
+      const updatedRow = data.find((item) => item.key === selectedRowKey);
+      updateRankPost(updatedRow); // Update rank master datas
+      console.log('Updated row:', updatedRow);
+    } else {
+      console.log('No row selected for update.');
+    }
+  };
 
   const columns = [
     {
@@ -73,7 +110,9 @@ export function RankInput({ setActiveTab, number }) {
           value={record.laborCostA}
           addonAfter={'円'}
           min={0}
-          onChange={(e) => handleInputChange(record.key, 'laborCostA', e)}
+          onChange={(value) =>
+            handleInputChange(record.key, 'laborCostA', value)
+          }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -89,7 +128,9 @@ export function RankInput({ setActiveTab, number }) {
           value={record.laborCostB}
           addonAfter={'円'}
           min={0}
-          onChange={(e) => handleInputChange(record.key, 'laborCostB', e)}
+          onChange={(value) =>
+            handleInputChange(record.key, 'laborCostB', value)
+          }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -106,7 +147,9 @@ export function RankInput({ setActiveTab, number }) {
           addonAfter="%"
           min={0}
           max={100}
-          onChange={(e) => handleInputChange(record.key, 'siteMiscell', e)}
+          onChange={(value) =>
+            handleInputChange(record.key, 'siteMiscell', value)
+          }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
@@ -123,35 +166,15 @@ export function RankInput({ setActiveTab, number }) {
           min={0}
           max={100}
           value={record.otherExpens}
-          onChange={(e) => handleInputChange(record.key, 'otherExpens', e)}
+          onChange={(value) =>
+            handleInputChange(record.key, 'otherExpens', value)
+          }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
         />
       ),
     },
   ];
-  const updateRankPost = async (updatedRow) => {
-    try {
-      const response = await axios.put(
-        `/api/rank/${updatedRow.id}`,
-        updatedRow,
-      );
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handleUpdate = () => {
-    if (selectedRowKey) {
-      const updatedRow = data.find((item) => item.id === selectedRowKey);
-
-      setSelectedRow(updatedRow);
-      updateRankPost(updatedData);
-      console.log('Updated row:', updatedRow);
-    } else {
-      console.log('No row selected for update.');
-    }
-  };
 
   return (
     <div className="p-2 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
@@ -171,7 +194,7 @@ export function RankInput({ setActiveTab, number }) {
             bordered
             className="mb-0 border-collapse"
             rowClassName={(record) =>
-              record.name === selectedRowKey ? 'bg-blue-100' : ''
+              record.key === selectedRowKey ? 'bg-blue-100' : ''
             }
             onRow={(record) => ({
               onClick: () => handleRowSelect(record),
@@ -209,4 +232,5 @@ export function RankInput({ setActiveTab, number }) {
     </div>
   );
 }
+
 export default RankInput;

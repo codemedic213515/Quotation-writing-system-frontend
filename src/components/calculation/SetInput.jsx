@@ -3,10 +3,81 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export function SetInput({ setActiveTab, number }) {
-  if (number === '') {
-    setActiveTab('select');
-  }
+  const [data, setData] = useState([
+    {
+      key: '1',
+      name: '電線管',
+      netRate: 100, // Default Net Rate for Conduit
+      replenishmentRate: 100, // Default Supply Rate for Conduit
+    },
+    {
+      key: '2',
+      name: '電線・ケーブル',
+      netRate: 100, // Default Net Rate for Cable
+      replenishmentRate: 100, // Default Supply Rate for Cable
+    },
+  ]);
+
+  useEffect(() => {
+    if (number === '') {
+      setActiveTab('select');
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`/api/quotationcalc/${number}`);
+        console.log('Fetched Data:', response.data); // Add this log to check what data looks like
+        if (Array.isArray(response.data)) {
+          const transformedData = transformData(response.data);
+          const updatedData = decodeData(transformedData);
+          setData(updatedData);
+        } else {
+          // Handle case where data is not an array
+          console.error('Expected an array but received:', response.data);
+          setData([
+            {
+              key: '1',
+              name: '電線管',
+              netRate: 100,
+              replenishmentRate: 100,
+            },
+            {
+              key: '2',
+              name: '電線・ケーブル',
+              netRate: 100,
+              replenishmentRate: 100,
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setData([
+          {
+            key: '1',
+            name: '電線管',
+            netRate: 100,
+            replenishmentRate: 100,
+          },
+          {
+            key: '2',
+            name: '電線・ケーブル',
+            netRate: 100,
+            replenishmentRate: 100,
+          },
+        ]);
+      }
+    };
+
+    fetchData();
+  }, [number]);
+
   const transformData = (data) => {
+    if (!Array.isArray(data)) {
+      console.error('Expected an array but received:', data);
+      return {}; // Return an empty object if data is not an array
+    }
+
     return data.reduce((acc, item) => {
       if (item.name === '電線管') {
         acc.tubeNetRate = item.netRate;
@@ -20,61 +91,45 @@ export function SetInput({ setActiveTab, number }) {
     }, {});
   };
 
-  // function decodeData(transformedData) {
-  //   setData([])
+  const decodeData = (transformedData) => {
+    const newData = [];
+    if (
+      transformedData.tubeNetRate !== undefined &&
+      transformedData.tubeReplenishmentRate !== undefined
+    ) {
+      newData.push({
+        key: '1',
+        name: '電線管',
+        netRate: transformedData.tubeNetRate,
+        replenishmentRate: transformedData.tubeReplenishmentRate,
+      });
+    }
 
-  //   if (
-  //     transformedData.tubeNetRate !== undefined &&
-  //     transformedData.tubeReplenishmentRate !== undefined
-  //   ) {
-  //     data.push({
-  //       key: '1',
-  //       name: '電線管',
-  //       netRate: transformedData.tubeNetRate,
-  //       replenishmentRate: transformedData.tubeReplenishmentRate,
-  //     });
-  //   }
+    if (
+      transformedData.cableNetRate !== undefined &&
+      transformedData.cableReplenishmentRate !== undefined
+    ) {
+      newData.push({
+        key: '2',
+        name: '電線・ケーブル',
+        netRate: transformedData.cableNetRate,
+        replenishmentRate: transformedData.cableReplenishmentRate,
+      });
+    }
 
-  //   if (
-  //     transformedData.cableNetRate !== undefined &&
-  //     transformedData.cableReplenishmentRate !== undefined
-  //   ) {
-  //     data.push({
-  //       key: '2',
-  //       name: '電線・ケーブル',
-  //       netRate: transformedData.cableNetRate,
-  //       replenishmentRate: transformedData.cableReplenishmentRate,
-  //     });
-  //   }
+    return newData;
+  };
 
-  //   return data;
-  // }
-
-  // State to store the net rate and replenishment rate for each material
-  const [data, setData] = useState([
-    {
-      key: '1',
-      name: '電線管',
-      netRate: 100, // Actual Net Rate for Conduit
-      replenishmentRate: 100, // Supply Rate for Conduit
-    },
-    {
-      key: '2',
-      name: '電線・ケーブル',
-      netRate: 100, // Actual Net Rate for Cable
-      replenishmentRate: 100, // Supply Rate for Cable
-    },
-  ]);
   const send = async (result) => {
-    console.log(result);
-
+    const quotationCalc = result;
     try {
-      const response = await axios.post(`/api/quotationcalc`, result);
+      const response = await axios.post(`/api/quotationcalc`, quotationCalc);
       console.log(response);
     } catch (error) {
       console.log(error);
     }
   };
+
   const sendData = () => {
     const result = transformData(data);
     result.number = number;
@@ -83,7 +138,6 @@ export function SetInput({ setActiveTab, number }) {
     setActiveTab('rank');
   };
 
-  // Handle changes in input fields for net rate and replenishment rate
   const handleInputChange = (value, key, type) => {
     setData((prevData) =>
       prevData.map((item) =>
@@ -113,7 +167,6 @@ export function SetInput({ setActiveTab, number }) {
           min={0}
           className="w-24"
           addonAfter="%"
-          defaultValue={100}
           value={record.netRate}
           onChange={(value) => handleInputChange(value, record.key, 'netRate')}
         />
@@ -130,7 +183,6 @@ export function SetInput({ setActiveTab, number }) {
           min={0}
           className="w-24"
           addonAfter="%"
-          defaultValue={100}
           value={record.replenishmentRate}
           onChange={(value) =>
             handleInputChange(value, record.key, 'replenishmentRate')
