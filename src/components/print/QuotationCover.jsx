@@ -1,30 +1,39 @@
+import { useEffect, useState, useRef } from 'react';
 import {
   Card,
   Checkbox,
   Divider,
   Image,
   Input,
+  Modal,
   InputNumber,
   Radio,
   Select,
   Typography,
+  Button,
 } from 'antd';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import html2pdf from 'html2pdf.js';
+import CoverPDF from './coverPdf';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const QuotationCover = ({ number }) => {
   const [quotation, setQuotation] = useState([]);
+  const [quotationPrice, setQuotationPrice] = useState([]);
   const [formattedDate, setFormattedDate] = useState('');
   const [tax, setTax] = useState(0);
+  const [greeting, setGreeting] = useState('御中');
   const [taxRate, setTaxRate] = useState(10);
   const [taxAdd, setTaxAdd] = useState(false);
   const [net, setNet] = useState(0);
   const [netRate, setNetRate] = useState(10);
   const [netAdd, setNetAdd] = useState(false);
   const [other, setOther] = useState();
+  const [method, setMethod] = useState('従来通り');
+  const [des, setDes] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false); // ✅ Modal State
   const convertToReiwa = (dateStr) => {
     const date = new Date(dateStr);
     const reiwaYear = date.getFullYear() - 2018;
@@ -35,14 +44,20 @@ const QuotationCover = ({ number }) => {
     if (e != true) {
       setNetAdd(false);
       setTaxAdd(false);
-      setTotalPrice(19912000);
+      setTotalPrice(quotationPrice);
     } else {
       setTotalPrice(0);
     }
   };
+  const openModal = () => {
+    setModalVisible(true);
+  };
+  const closeModal = () => {
+    setModalVisible(false);
+  };
   useEffect(() => {
     if (netAdd == true) {
-      setOther(`本見積書は消費税を含んでおりません。(¥${net})`);
+      setOther(`御社ネット (¥${net}) で御願い致します。`);
     }
     if (netAdd == false) {
       setOther('');
@@ -50,27 +65,41 @@ const QuotationCover = ({ number }) => {
   }, [netAdd, netRate]);
   useEffect(() => {
     if (taxAdd == true) {
-      setTotalPrice(totalPrice * (1 + taxRate / 100));
+      setTotalPrice(Math.round(totalPrice * (1 + taxRate / 100)));
+      setDes('');
     }
-    if (taxAdd == false) setTotalPrice(totalPrice / (1 + taxRate / 100));
+    if (taxAdd == false) {
+      setTotalPrice(Math.round(totalPrice / (1 + taxRate / 100)));
+      setDes(`本見積書は消費税を含んでおりません。(¥${tax})`);
+    }
   }, [taxAdd]);
   useEffect(() => {
     getQuotationMain();
-  }, [number]); // Only runs when `number` changes
-
+    fetchQuotationPrice();
+  }, [number]);
+  const fetchQuotationPrice = async () => {
+    try {
+      const response = await axios.get('/api/quotationprice/calculate', {
+        params: { quotationNumber: number },
+      });
+      const roundedPrice = Math.round(response.data.totalProposalCost);
+      setQuotationPrice(roundedPrice);
+      setTotalPrice(roundedPrice); // Set total price initially
+    } catch (error) {
+      console.error('Error fetching quotation price:', error);
+    }
+  };
   useEffect(() => {
     if (quotation.createdAt) {
       setFormattedDate(convertToReiwa(quotation.createdAt));
     }
-  }, [quotation]); // Runs only when `quotation` changes, but does NOT trigger `getQuotationMain`
-
+  }, [quotation]);
   useEffect(() => {
-    setTax((taxRate * 19912000) / 100);
-  }, [taxRate]);
-
+    setTax(Math.round((taxRate * quotationPrice) / 100));
+  }, [taxRate, quotationPrice]);
   useEffect(() => {
-    setNet((netRate * 19912000) / 100);
-  }, [netRate]);
+    setNet(Math.round((netRate * quotationPrice) / 100));
+  }, [netRate, quotationPrice]);
   const getQuotationMain = async (number) => {
     try {
       const response = await axios.get('/api/quotationmain', {
@@ -80,15 +109,41 @@ const QuotationCover = ({ number }) => {
       });
       console.log('response: ', response.data.data);
       setQuotation(response.data.data[0]);
-      setTotalPrice(19912000);
     } catch (error) {
       console.log(error);
     }
   };
-
+  const data = {
+    number: number,
+    formattedDate: formattedDate,
+    export: quotation.export,
+    totalPrice: totalPrice,
+    name: quotation.name,
+    address: quotation.address,
+    method: method,
+    greeting: greeting,
+    other: other,
+    des: des,
+  };
+  const pdfRef = useRef();
+  const generatePDF = () => {
+    const element = pdfRef.current;
+    if (element) {
+      html2pdf()
+        .from(element)
+        .set({
+          margin: 20,
+          filename: 'quotation.pdf',
+          image: { type: 'png', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+        })
+        .save('quotation.pdf');
+    }
+  };
   return (
-    <div className="flex flex-row gap-8 p-6 justify-center">
-      <Card className="max-w-4xl  p-8 pb-2 font-sans border-black rounded-none">
+    <div className="flex flex-row gap-8 p-6 pt-0 justify-center">
+      <Card className="max-w-4xl p-2 pb-2 font-sans border-black rounded-none">
         {/* Header Section */}
         <div className="relative text-center mb-8">
           <Title level={2} className="font-normal">
@@ -109,8 +164,8 @@ const QuotationCover = ({ number }) => {
               <Text className="text-lg">{quotation.export}</Text>
               <Select
                 className="ml-5 w-auto"
-                defaultValue={'御中'}
-                allowClear
+                value={greeting}
+                onSelect={(e) => setGreeting(e)}
                 suffixIcon
               >
                 <Select.Option value="御中">御中</Select.Option>
@@ -118,7 +173,6 @@ const QuotationCover = ({ number }) => {
                 <Select.Option value="様">様</Select.Option>
               </Select>
             </div>
-
             {/* Total Amount */}
             <div className="my-8 w-96 p-0 ">
               <div className="flex border border-gray-900">
@@ -132,7 +186,6 @@ const QuotationCover = ({ number }) => {
                 </div>
               </div>
             </div>
-
             {/* Project Details */}
             <div className="space-y-4">
               <div className="flex border-b border-gray-300 pb-2">
@@ -150,24 +203,25 @@ const QuotationCover = ({ number }) => {
                 <Text>3ヶ月</Text>
               </div>
 
-              <div className="flex border-b border-gray-300 pb-2">
+              <div className="flex border-b border-gray-300 pb-2 items-center">
                 <Text className="w-32">御 支 払 条 件</Text>
                 <Select
                   className="w-auto"
                   allowClear
-                  defaultValue={'従来通り'}
+                  value={method}
                   suffixIcon
+                  onSelect={(e) => setMethod(e)}
                 >
                   <Select.Option value="従来通り">従来通り</Select.Option>
                   <Select.Option value="現金">現金</Select.Option>
                   <Select.Option value="御商談の上">御商談の上</Select.Option>
                 </Select>
+                <Text className="text-xs ml-2">{other}</Text>
               </div>
             </div>
-
             {/* Remarks */}
             <div className="mt-4">
-              <Text>備 考: {other}</Text>
+              <Text>備 考: {des}</Text>
             </div>
           </div>
           <div className="w-2/6">
@@ -275,7 +329,32 @@ const QuotationCover = ({ number }) => {
         >
           金抜き
         </Checkbox>
+        <Button
+          onClick={() => {
+            openModal();
+          }}
+        >
+          Print PDF
+        </Button>
       </div>
+      <Modal
+        title="見積プレビュー"
+        open={modalVisible}
+        onCancel={closeModal}
+        footer={[
+          <Button key="close" onClick={closeModal}>
+            Close
+          </Button>,
+          <Button key="download" type="primary" onClick={generatePDF}>
+            Download PDF
+          </Button>,
+        ]}
+        width={900}
+      >
+        <div ref={pdfRef}>
+          <CoverPDF data={data} />
+        </div>
+      </Modal>
     </div>
   );
 };
