@@ -152,16 +152,10 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
         dataSource={quotations}
         loading={loading}
         rowKey="id"
-        pagination={false}
-      />
-      <Pagination
-        current={page}
-        pageSize={pageSize}
-        total={totalRecords}
-        onChange={handlePageChange}
-        showSizeChanger
-        pageSizeOptions={['5', '10', '20', '50']}
-        className="mt-4 text-center justify-center"
+        pagination={{
+          position: ['bottomcenter'],
+          pageSize: 5,
+        }}
       />
     </div>
   );

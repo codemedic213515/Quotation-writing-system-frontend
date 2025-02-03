@@ -1,20 +1,10 @@
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  FloatButton,
-  Table,
-  Pagination,
-  message,
-  Button,
-} from 'antd';
-import { useState, useEffect } from 'react';
+import { Button, DatePicker, Form, Input, Select, Table, message } from 'antd';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-export function SelectQuotation({ setActiveTab }) {
+export function SelectQuotation({ setActiveTab, setNumber }) {
   const [quotations, setQuotations] = useState([]);
-  const [users, setUsers] = useState([]); // State to store users for filtering
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -28,7 +18,7 @@ export function SelectQuotation({ setActiveTab }) {
   const fetchUsers = async () => {
     try {
       const response = await axios.get('/api/quotationmain/users');
-      setUsers(response.data); // Set the list of users for the "Creator Name" filter
+      setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
       message.error('Failed to fetch users');
@@ -38,7 +28,6 @@ export function SelectQuotation({ setActiveTab }) {
   const fetchQuotations = async () => {
     setLoading(true);
     try {
-      // Only pass filters that are not null or empty
       const activeFilters = {};
       if (filters.code) activeFilters.code = filters.code;
       if (filters.creater) activeFilters.creater = filters.creater;
@@ -48,7 +37,7 @@ export function SelectQuotation({ setActiveTab }) {
         params: {
           page,
           pageSize,
-          ...activeFilters, // Apply filters dynamically
+          ...activeFilters,
         },
       });
 
@@ -63,8 +52,8 @@ export function SelectQuotation({ setActiveTab }) {
   };
 
   useEffect(() => {
-    fetchUsers(); // Fetch users once on component mount
-    fetchQuotations(); // Fetch quotations when the component mounts or when filters/page/size change
+    fetchUsers();
+    fetchQuotations();
   }, [page, pageSize, filters]);
 
   const handlePageChange = (newPage, newPageSize) => {
@@ -75,24 +64,13 @@ export function SelectQuotation({ setActiveTab }) {
   const handleFilterChange = (key, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      [key]: value || null, // Ensure empty values are treated as null
+      [key]: value || null,
     }));
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/quotationmain/${id}`);
-      message.success('Quotation deleted successfully');
-      fetchQuotations(); // Refresh data after deletion
-    } catch (error) {
-      console.error('Error deleting quotation:', error);
-      message.error('Failed to delete quotation');
-    }
-  };
-
   const handleEdit = (quotation) => {
-    setActiveTab('basic'); // Set the active tab to "basic"
-    // You can also send the `quotation.code` or `quotation` object to the edit page, depending on your app's flow
+    setActiveTab('cover');
+    setNumber(quotation.code);
     console.log('Editing quotation:', quotation);
   };
 
@@ -103,17 +81,17 @@ export function SelectQuotation({ setActiveTab }) {
       key: 'id',
     },
     {
-      title: 'Quotation Number',
+      title: '見積番号',
       dataIndex: 'code',
       key: 'code',
     },
     {
-      title: 'Creator Name',
+      title: '作成者名',
       dataIndex: 'creater',
       key: 'creater',
     },
     {
-      title: 'Creation Date',
+      title: '作成日',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date) => new Date(date).toLocaleDateString(),
@@ -124,10 +102,7 @@ export function SelectQuotation({ setActiveTab }) {
       render: (_, record) => (
         <div>
           <Button onClick={() => handleEdit(record)} type="link">
-            Edit
-          </Button>
-          <Button onClick={() => handleDelete(record.id)} type="link" danger>
-            Delete
+            編集
           </Button>
         </div>
       ),
@@ -136,28 +111,28 @@ export function SelectQuotation({ setActiveTab }) {
 
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] overflow-auto font-bold">
-      <Form layout="inline" className="mb-4">
-        <Form.Item label="Quotation Number">
+      <Form layout="inline" className="mb-4 ">
+        <Form.Item label="見積番号">
           <Input
             allowClear
-            placeholder="Number"
+            placeholder="見積番号"
             onChange={(e) => handleFilterChange('code', e.target.value)}
           />
         </Form.Item>
-        <Form.Item label="Creation Date">
+        <Form.Item label="作成日">
           <DatePicker
             allowClear
-            placeholder="Date"
+            placeholder="作成日"
             onChange={(value) =>
               handleFilterChange('createDate', value?.format('YYYY-MM-DD'))
             }
           />
         </Form.Item>
-        <Form.Item label="Creator Name">
+        <Form.Item label="作成者名">
           <Select
             showSearch
             allowClear
-            placeholder="User Name"
+            placeholder="作成者名"
             options={users.map((user) => ({ label: user, value: user }))}
             onChange={(value) => handleFilterChange('creater', value)}
           />
@@ -168,22 +143,10 @@ export function SelectQuotation({ setActiveTab }) {
         dataSource={quotations}
         loading={loading}
         rowKey="id"
-        pagination={false}
-      />
-      <Pagination
-        current={page}
-        pageSize={pageSize}
-        total={totalRecords}
-        onChange={handlePageChange}
-        showSizeChanger
-        pageSizeOptions={['5', '10', '20', '50']}
-        className="mt-4 text-center"
-      />
-      <FloatButton
-        shape="square"
-        type="primary"
-        description="次へ"
-        className="mb-16 mr-10 animate-bounce"
+        pagination={{
+          position: ['bottomcenter'],
+          pageSize: 5,
+        }}
       />
     </div>
   );

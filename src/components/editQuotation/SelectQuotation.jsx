@@ -1,17 +1,16 @@
 import {
-  Form,
-  Input,
-  Select,
+  Button,
   DatePicker,
   FloatButton,
+  Form,
+  Input,
+  Modal,
+  Select,
   Table,
-  Pagination,
   message,
-  Button,
-  Modal, // Import Modal
 } from 'antd';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 export function SelectQuotation({ setActiveTab, setNumber }) {
   const [quotations, setQuotations] = useState([]);
@@ -183,17 +182,12 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
         dataSource={quotations}
         loading={loading}
         rowKey="id"
-        pagination={false}
+        pagination={{
+          position: ['bottomcenter'],
+          pageSize: 5,
+        }}
       />
-      <Pagination
-        current={page}
-        pageSize={pageSize}
-        total={totalRecords}
-        onChange={handlePageChange}
-        showSizeChanger
-        pageSizeOptions={['5', '10', '20', '50']}
-        className="mt-4 text-center justify-center"
-      />
+
       <FloatButton
         shape="square"
         type="primary"
