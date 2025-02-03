@@ -1,8 +1,31 @@
-import React, { useState } from 'react';
-import { Card, CardBody } from '@material-tailwind/react';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  CardBody,
+  Tabs,
+  TabsHeader,
+  Tab,
+} from '@material-tailwind/react';
+import {
+  DocumentMagnifyingGlassIcon,
+  BookOpenIcon,
+  CodeBracketSquareIcon,
+  TagIcon,
+  AdjustmentsHorizontalIcon,
+  QueueListIcon,
+  CpuChipIcon,
+} from '@heroicons/react/24/solid';
+import SelectQuotation from '@/components/print/SelectQuotation';
+import QuotationCover from '@/components/print/QuotationCover';
+import Detailed from '@/components/print/Detailed';
+import Classification from '@/components/print/Classification';
+import SummaryTable from '@/components/print/SummaryTable';
+import QuotationList from '@/components/print/QuotationList';
+import CoefficientList from '@/components/print/CoefficientList';
 
 export function Print() {
   const [activeTab, setActiveTab] = useState('select');
+  const [number, setNumber] = useState('');
   return (
     <div>
       <div className="relative mt-8 h-28 w-full overflow-hidden rounded-xl ">
@@ -10,28 +33,33 @@ export function Print() {
       </div>
       <Card className="mx-3 -mt-16 mb-6 lg:mx-4 border border-blue-gray-100">
         <CardBody className="p-4">
-          {/* <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
+          <div className="mb-10 flex items-center justify-between flex-wrap gap-6">
             <div className="flex items-center ml-11 mt-4 text-lg gap-6 font-bold">
-              {activeTab === `select`
+              {activeTab === 'select'
                 ? '明細書選択'
-                : activeTab === 'set'
-                ? '数量 (Net補給率)'
-                : activeTab === 'rank'
-                ? 'ランク（労務単価・現場雑費率・諸経費率)'
-                : activeTab === 'price'
-                ? '部材単価 (乗率・値引率)'
-                : activeTab === 'material'
-                ? '材料消費率'
-                : activeTab === 'other'
-                ? 'その他計算設定'
+                : activeTab === `cover`
+                ? '見積書表紙'
+                : activeTab === 'detailed'
+                ? '内訳明細表'
+                : activeTab === 'classific'
+                ? '分類別集計表'
+                : activeTab === 'summary'
+                ? '総括表'
+                : activeTab === 'list'
+                ? '見積一覧表'
+                : activeTab === 'coefficient'
+                ? '係数一覧表'
                 : ''}
             </div>
-            <div>
+            <div className="text-lg">
               <Tabs value={activeTab}>
                 <TabsHeader>
                   <Tab
                     value="select"
-                    onClick={() => setActiveTab('select')}
+                    onClick={() => {
+                      setActiveTab('select');
+                      setNumber('');
+                    }}
                     className={`${
                       activeTab === 'select'
                         ? 'active-tab font-bold text-[#00B3F4]'
@@ -42,84 +70,107 @@ export function Print() {
                     明細書選択
                   </Tab>
                   <Tab
-                    value="set"
-                    onClick={() => setActiveTab('set')}
+                    value="cover"
+                    onClick={() => setActiveTab('cover')}
                     className={`${
-                      activeTab === 'set'
+                      activeTab === 'cover'
                         ? 'active-tab font-bold text-[#00B3F4]'
                         : 'text-blue-gray-500 font-bold'
-                    } w-auto px-4`}
+                    } w-auto `}
                   >
-                    <CalculatorOutlined className="items-center mr-2 h-5 w-5" />
-                    数量
+                    <BookOpenIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    見積書表紙
                   </Tab>
                   <Tab
-                    value="rank"
-                    onClick={() => setActiveTab('rank')}
+                    value="detailed"
+                    onClick={() => setActiveTab('detailed')}
                     className={`${
-                      activeTab === 'rank'
+                      activeTab === 'detailed'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    } w-auto px-4`}
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
-                    <UserOutlined className="items-center mr-2 h-5 w-5" />
-                    ランク
+                    <CodeBracketSquareIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    内訳明細表
                   </Tab>
                   <Tab
-                    value="price"
-                    onClick={() => setActiveTab('price')}
+                    value="classific"
+                    onClick={() => setActiveTab('classific')}
                     className={`${
-                      activeTab === 'price'
+                      activeTab === 'classific'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    } w-auto px-4`}
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
-                    <TagsOutlined className="items-center mr-2 h-5 w-5" />
-                    部材単価
+                    <TagIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    分類別集計表
                   </Tab>
                   <Tab
-                    value="material"
-                    onClick={() => setActiveTab('material')}
+                    value="summary"
+                    onClick={() => setActiveTab('summary')}
                     className={`${
-                      activeTab === 'material'
+                      activeTab === 'summary'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    } w-auto px-4`}
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
-                    <BarChartOutlined className="items-center mr-2 h-5 w-5" />
-                    材料消費率
+                    <AdjustmentsHorizontalIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    総括表
                   </Tab>
                   <Tab
-                    value="other"
-                    onClick={() => setActiveTab('other')}
+                    value="list"
+                    onClick={() => setActiveTab('list')}
                     className={`${
-                      activeTab === 'other'
+                      activeTab === 'list'
                         ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'font-bold text-blue-gray-500'
-                    } w-auto px-4`}
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
                   >
-                    <SettingOutlined className="items-center mr-2 h-5 w-5" />
-                    その他計算設定
+                    <QueueListIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    見積一覧表
+                  </Tab>
+                  <Tab
+                    value="coefficient"
+                    onClick={() => setActiveTab('coefficient')}
+                    className={`${
+                      activeTab === 'coefficient'
+                        ? 'active-tab font-bold text-[#00B3F4]'
+                        : 'text-blue-gray-500 font-bold'
+                    } w-auto `}
+                  >
+                    <CpuChipIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
+                    係数一覧表
                   </Tab>
                 </TabsHeader>
               </Tabs>
             </div>
-          </div> */}
-
+          </div>
+          {/* Render Content Based on Active Tab */}
           <div className="tab-content">
-            {/* {activeTab === 'select' && (
-              <SelectQuotation setActiveTab={setActiveTab} />
+            {activeTab === 'select' && (
+              <SelectQuotation
+                setActiveTab={setActiveTab}
+                setNumber={setNumber}
+              />
             )}
-            {activeTab === 'set' && <SetInput setActiveTab={setActiveTab} />}
-            {activeTab === 'rank' && <RankInput setActiveTab={setActiveTab} />}
-            {activeTab === 'price' && (
-              <PriceInput setActiveTab={setActiveTab} />
+            {activeTab === 'cover' && (
+              <QuotationCover setActiveTab={setActiveTab} number={number} />
             )}
-            {activeTab === 'material' && (
-              <MaterialInput setActiveTab={setActiveTab} />
+            {activeTab === 'detailed' && (
+              <Detailed setActiveTab={setActiveTab} number={number} />
             )}
-            {activeTab === 'other' && <OtherInput />} */}
-            <p className="h-full w-full">Please check your connection...</p>
+            {activeTab === 'classific' && (
+              <Classification setActiveTab={setActiveTab} number={number} />
+            )}
+            {activeTab === 'summary' && (
+              <SummaryTable setActiveTab={setActiveTab} number={number} />
+            )}
+            {activeTab === 'list' && (
+              <QuotationList setActiveTab={setActiveTab} number={number} />
+            )}
+            {activeTab === 'coefficient' && (
+              <CoefficientList setActiveTab={setActiveTab} number={number} />
+            )}
           </div>
         </CardBody>
       </Card>

@@ -65,6 +65,7 @@ export function EditQuotation() {
                     <DocumentMagnifyingGlassIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
                     明細書選択
                   </Tab>
+
                   <Tab
                     value="basic"
                     onClick={() => setActiveTab('basic')}

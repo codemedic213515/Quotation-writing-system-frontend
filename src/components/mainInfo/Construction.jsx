@@ -9,7 +9,6 @@ import {
   Radio,
   Form,
 } from 'antd';
-import CTable from '../CTable';
 
 export function PostCode() {
   const [data, setData] = useState([]);
@@ -89,7 +88,7 @@ export function PostCode() {
       <Form>
         <Select showSearch allowClear className="w-1/4 mb-5" />
         <Form.Item>
-          <CTable
+          <Table
             columns={columns}
             dataSource={data}
             pagination={false}
