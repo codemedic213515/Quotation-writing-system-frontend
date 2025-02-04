@@ -88,26 +88,31 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
       title: 'No',
       dataIndex: 'id',
       key: 'id',
+      align: 'center',
     },
     {
       title: '見積番号',
       dataIndex: 'code',
       key: 'code',
+      align: 'center',
     },
     {
       title: '作成者名',
       dataIndex: 'creater',
       key: 'creater',
+      align: 'center',
     },
     {
       title: '作成日',
       dataIndex: 'createdAt',
       key: 'createdAt',
+      align: 'center',
       render: (date) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
+      align: 'center',
       render: (_, record) => (
         <div>
           <Button onClick={() => handleEdit(record)} type="link">
