@@ -1,14 +1,5 @@
-import React, { useState } from 'react';
-import {
-  Table,
-  Input,
-  InputNumber,
-  Button,
-  Select,
-  FloatButton,
-  Radio,
-  Form,
-} from 'antd';
+import { Form, Input, Select } from 'antd';
+import { useState } from 'react';
 import CTable from '../CTable';
 
 export function Rank() {

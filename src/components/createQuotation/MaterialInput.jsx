@@ -102,22 +102,6 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
     }
   };
 
-  // const fetchCategory4 = async (
-  //   category1Id,
-  //   category2Id,
-  //   category3Id,
-  //   index,
-  // ) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `api/category4?category1=${category1Id}&category2=${category2Id}&category3=${category3Id}`,
-  //     );
-  //     setCategory4Option((prev) => ({ ...prev, [index]: response.data }));
-  //   } catch (error) {
-  //     console.error('Error fetching category4:', error);
-  //   }
-  // };
-
   const fetchMaterials = async (
     category1Id,
     category2Id,

@@ -286,7 +286,6 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       const response = await axios.post('/api/customer', customerData);
       if (response.status === 200) {
         message.success('Customer created successfully');
-        // Clear the form fields after successful creation
         setCustomerName('');
         setBranchName('');
         setCustomerAddressValue('0');

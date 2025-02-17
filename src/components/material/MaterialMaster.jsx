@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
-import {
-  Table,
-  Input,
-  InputNumber,
-  Button,
-  Select,
-  FloatButton,
-  Radio,
-  Form,
-} from 'antd';
-import CTable from '../CTable';
+import { Form, Input, Select, Table } from 'antd';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export function MaterialMaster() {
   const [data, setData] = useState([]);
-
   const [selectedRowKey, setSelectedRowKey] = useState(null);
+  const [category1, setCategory1] = useState([]);
+  const [category2, setCategory2] = useState([]);
+  const [category3, setCategory3] = useState([]);
+  const [selectedCategory1, setSelectedCategory1] = useState(0);
+  const [selectedCategory2, setSelectedCategory2] = useState(0);
+  const [selectedCategory3, setSelectedCategory3] = useState(0);
+  const [selectedABCode, setSelectedABCode] = useState(0);
 
   const handleInputChange = (key, field, value) => {
     const newData = data.map((item) => {
@@ -30,17 +27,83 @@ export function MaterialMaster() {
     setSelectedRowKey(record.key);
   };
 
+  const fetchCategory1Data = async () => {
+    try {
+      const response = await axios.get('/api/category1');
+      let a = response.data.map((item) => ({
+        value: item.id,
+        label: item.name,
+        id: item.id,
+      }));
+      setCategory1(a);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCategory2Data = async (e) => {
+    setSelectedCategory1(e);
+    try {
+      const response = await axios.get(`/api/category2?category1=${e}`);
+      let b = response.data.map((item) => ({
+        value: item.category2,
+        label: item.name,
+        id: item.id,
+      }));
+      setCategory2(b);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCategory3Data = async (e) => {
+    setSelectedCategory2(e);
+    try {
+      const response = await axios.get(
+        `/api/category3?category1=${selectedCategory1}&category2=${e}`,
+      );
+      let c = response.data.map((item) => ({
+        value: item.category3,
+        label: item.name,
+        id: item.id,
+      }));
+      setCategory3(c);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchMaterialMasterData = async () => {
+    try {
+      const response = await axios.get('/api/material', {
+        params: {
+          category1: selectedCategory1,
+          category2: selectedCategory2,
+          category3: selectedCategory3,
+          abCode: selectedABCode,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMaterialMasterData();
+    fetchCategory1Data();
+  }, []);
+
   const columns = [
     {
-      title: '品名',
-      dataIndex: 'ItemName',
-      key: 'ItemName',
+      title: 'カテゴリー',
+      dataIndex: 'categoryNam',
+      key: 'categoryNam',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.ItemName}
           onChange={(e) =>
-            handleInputChange(record.key, 'ItemName', e.target.value)
+            handleInputChange(record.key, 'categoryNam', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -49,14 +112,14 @@ export function MaterialMaster() {
     },
     {
       title: '名称・規格',
-      dataIndex: 'Specification',
-      key: 'Specification',
+      dataIndex: 'specification',
+      key: 'specification',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.Specification}
           onChange={(e) =>
-            handleInputChange(record.key, 'Specification', e.target.value)
+            handleInputChange(record.key, 'specification', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -65,14 +128,14 @@ export function MaterialMaster() {
     },
     {
       title: '標準単価',
-      dataIndex: 'StandardPrice',
-      key: 'StandardPrice',
+      dataIndex: 'standardPrice',
+      key: 'standardPrice',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.StandardPrice}
           onChange={(e) =>
-            handleInputChange(record.key, 'StandardPrice', e.target.value)
+            handleInputChange(record.key, 'standardPrice', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -81,14 +144,14 @@ export function MaterialMaster() {
     },
     {
       title: '提出単価',
-      dataIndex: 'SubmissionPrice',
-      key: 'SubmissionPrice',
+      dataIndex: 'submissionPrice',
+      key: 'submissionPrice',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.SubmissionPrice}
           onChange={(e) =>
-            handleInputChange(record.key, 'SubmissionPrice', e.target.value)
+            handleInputChange(record.key, 'submissionPrice', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -97,14 +160,14 @@ export function MaterialMaster() {
     },
     {
       title: '社内単価',
-      dataIndex: 'InternalPrice',
-      key: 'InternalPrice',
+      dataIndex: 'internalPrice',
+      key: 'internalPrice',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.InternalPrice}
           onChange={(e) =>
-            handleInputChange(record.key, 'InternalPrice', e.target.value)
+            handleInputChange(record.key, 'internalPrice', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -113,14 +176,14 @@ export function MaterialMaster() {
     },
     {
       title: '建設物価',
-      dataIndex: 'ConstructionPrice',
-      key: 'ConstructionPrice',
+      dataIndex: 'constructionPrice',
+      key: 'constructionPrice',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.ConstructionPrice}
           onChange={(e) =>
-            handleInputChange(record.key, 'ConstructionPrice', e.target.value)
+            handleInputChange(record.key, 'constructionPrice', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -129,14 +192,14 @@ export function MaterialMaster() {
     },
     {
       title: '歩掛',
-      dataIndex: 'LaborCost',
-      key: 'LaborCost',
+      dataIndex: 'laborCost',
+      key: 'lborCost',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.LaborCost}
           onChange={(e) =>
-            handleInputChange(record.key, 'LaborCost', e.target.value)
+            handleInputChange(record.key, 'laborCost', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -145,14 +208,14 @@ export function MaterialMaster() {
     },
     {
       title: '補充率',
-      dataIndex: 'ReplenishmentRate',
-      key: 'ReplenishmentRate',
+      dataIndex: 'replenishmentRate',
+      key: 'replenishmentRate',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.ReplenishmentRate}
           onChange={(e) =>
-            handleInputChange(record.key, 'ReplenishmentRate', e.target.value)
+            handleInputChange(record.key, 'replenishmentRate', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -177,14 +240,14 @@ export function MaterialMaster() {
     },
     {
       title: '材料率',
-      dataIndex: 'MaterialRate',
-      key: 'MaterialRate',
+      dataIndex: 'materialRate',
+      key: 'materialRate',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.MaterialRate}
           onChange={(e) =>
-            handleInputChange(record.key, 'MaterialRate', e.target.value)
+            handleInputChange(record.key, 'materialRate', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -193,14 +256,14 @@ export function MaterialMaster() {
     },
     {
       title: '単位',
-      dataIndex: 'Unit',
-      key: 'Unit',
+      dataIndex: 'unit',
+      key: 'unit',
       align: 'center',
       render: (text, record) => (
         <Input
           value={record.Unit}
           onChange={(e) =>
-            handleInputChange(record.key, 'Unit', e.target.value)
+            handleInputChange(record.key, 'unit', e.target.value)
           }
           className="w-auto"
           disabled={selectedRowKey !== record.key}
@@ -238,12 +301,53 @@ export function MaterialMaster() {
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
       <Form>
         <div className="flex flex-row gap-4 mb-5 justify-center">
-          <Select showSearch allowClear placeholder="Name" className="w-1/4 " />
-          <Select showSearch allowClear placeholder="Group" className="w-1/4" />
-          <Select showSearch allowClear placeholder="Rank" className="w-1/4" />
+          <Select
+            showSearch
+            allowClear
+            placeholder="Category1"
+            className="w-1/4 "
+            options={category1}
+            onSelect={(e) => {
+              fetchCategory2Data(e);
+            }}
+          />
+          <Select
+            showSearch
+            allowClear
+            placeholder="Category2"
+            className="w-1/4"
+            options={category2}
+            onSelect={(e) => {
+              fetchCategory3Data(e);
+            }}
+          />
+          <Select
+            showSearch
+            allowClear
+            placeholder="Category3"
+            className="w-1/4"
+            options={category3}
+            onSelect={(e) => {
+              setSelectedCategory3(e);
+            }}
+          />
+
+          <Select
+            showSearch
+            allowClear
+            placeholder="Rank"
+            className="w-1/4"
+            options={[
+              { key: 'A', value: 'A', id: 'A' },
+              { key: 'B', value: 'B', id: 'B' },
+            ]}
+            onSelect={(e) => {
+              setSelectedABCode(e);
+            }}
+          />
         </div>
         <Form.Item>
-          <CTable
+          <Table
             columns={columns}
             dataSource={data}
             pagination={false}

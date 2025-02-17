@@ -559,7 +559,9 @@ const Detailed = ({ number, setActiveTab }) => {
     // Save PDF
     doc.save(`Quotation_${number}.pdf`);
   };
-
+  const selectType = async () => {
+    console.log(tableData);
+  };
   return (
     <div className="w-full p-6 bg-white ">
       <div className="flex w-full gap-4">
@@ -579,7 +581,7 @@ const Detailed = ({ number, setActiveTab }) => {
           <h1 className="text-center font-bold text-lg">編集</h1>
           <div className="flex gap-2">
             <Button onClick={generatePDF}>Print PDF</Button>
-            <Button>工種選択出力</Button>
+            <Button onClick={selectType}>工種選択出力</Button>
           </div>
           <Card bodyStyle={{ padding: '6px' }} className="w-full px-2">
             <div className="flex flex-row items-center ">
