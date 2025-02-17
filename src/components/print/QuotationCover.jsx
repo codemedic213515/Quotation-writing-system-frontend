@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
-import CoverPDF from './coverPdf';
+import CoverPDF from './CoverPDF';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
