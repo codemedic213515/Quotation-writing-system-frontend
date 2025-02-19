@@ -340,7 +340,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
                   <Radio value="1" style={{ width: 150 }}>
                     都道府県 :
                   </Radio>
-                  <div className="flex flex-grow items-center gap-2 justify-start">
+                  <div className="flex flex-grow items-center gap-2 justify-start w-auto" >
                     <Select
                       placeholder="県"
                       className="w-full"
@@ -353,6 +353,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
                     <Select
                       placeholder="都市"
                       className="w-full"
+                      popupMatchSelectWidth={false}
                       disabled={selectedMainAddressValue !== '1'}
                       allowClear
                       onChange={setSelectedMainCity}
@@ -637,6 +638,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
                           handleCustomerPostalSearch(e.target.value); // Trigger search on Enter
                         }
                       }}
+                      popupMatchSelectWidth={false}
                       allowClear
                       notFoundContent={
                         loading ? (

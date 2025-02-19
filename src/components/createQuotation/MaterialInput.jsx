@@ -286,6 +286,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                           <Select
                             allowClear
                             placeholder="品名"
+                            popupMatchSelectWidth={false}
                             onSelect={(value) =>
                               handleCategory1Change(value, field.key, item.id)
                             }
@@ -305,6 +306,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                           <Select
                             allowClear
                             placeholder="名称"
+                            popupMatchSelectWidth={false}
                             onSelect={(value) =>
                               handleCategory2Change(value, field.key, item.id)
                             }
@@ -326,6 +328,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                           <Select
                             allowClear
                             placeholder="規格"
+                            popupMatchSelectWidth={false}
                             onSelect={(value) =>
                               handleCategory3Change(value, field.key, item.id)
                             }
@@ -343,7 +346,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         </Form.Item>
 
                         <Form.Item name={[field.name, 'unit']}>
-                          <Select placeholder="単位" options={unitOption} />
+                          <Select placeholder="単位" options={unitOption}  popupMatchSelectWidth={false}/>
                         </Form.Item>
 
                         <Form.Item name={[field.name, 'externalCos']}>
@@ -361,6 +364,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         <Form.Item name={[field.name, 'categoryNam']}>
                           <Select
                             placeholder="分類名"
+                            popupMatchSelectWidth={false}
                             options={categoryOption}
                           />
                         </Form.Item>

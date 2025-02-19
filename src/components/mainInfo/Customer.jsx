@@ -180,12 +180,14 @@
 //             <Select
 //               placeholder="Prefecture"
 //               value={customerPrefecture}
+//popupMatchSelectWidth={false}
 //               onChange={handleCustomerPrefectureChange}
 //               options={prefectures}
 //             />
 //             <Select
 //               placeholder="City"
 //               value={customerCity}
+//popupMatchSelectWidth={false}
 //               onChange={setCustomerCity}
 //               options={cities}
 //             />
@@ -210,6 +212,7 @@
 //             onInputKeyDown={(e) => {
 //               if (e.key === 'Enter') handleCustomerPostalSearch(e.target.value);
 //             }}
+//popupMatchSelectWidth={false}
 //             options={customerOption ? [customerOption] : []}
 //             notFoundContent={loading ? <Spin size="small" /> : 'No data found'}
 //           />
@@ -252,6 +255,7 @@
 //           <Select
 //             value={customerRank}
 //             onChange={setCustomerRank}
+//popupMatchSelectWidth={false}
 //             options={[
 //               { value: 'A', label: 'A' },
 //               { value: 'B', label: 'B' },
@@ -262,6 +266,7 @@
 //           <Select
 //             value={customerGroup}
 //             onChange={setCustomerGroup}
+//popupMatchSelectWidth={false}
 //             options={[
 //               { value: '1', label: 'Group 1' },
 //               { value: '2', label: 'Group 2' },

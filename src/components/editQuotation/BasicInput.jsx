@@ -230,6 +230,7 @@ const BasicInput = ({ setActiveTab, number }) => {
                     <Select
                       placeholder="県"
                       className="w-full"
+                      popupMatchSelectWidth={false}
                       disabled={selectedMainAddressValue !== '1'}
                       allowClear
                       onSelect={(e) => setSelectedMainPrefecture(e)}
@@ -239,6 +240,7 @@ const BasicInput = ({ setActiveTab, number }) => {
                     <Select
                       placeholder="都市"
                       className="w-full"
+                      popupMatchSelectWidth={false}
                       disabled={selectedMainAddressValue !== '1'}
                       allowClear
                       onChange={setSelectedMainCity}
@@ -276,6 +278,7 @@ const BasicInput = ({ setActiveTab, number }) => {
                     <Select
                       showSearch
                       value={option.label}
+                      popupMatchSelectWidth={false}
                       disabled={selectedMainAddressValue !== '3'}
                       onSearch={(value) => {
                         /* Wait for the user to press Enter */

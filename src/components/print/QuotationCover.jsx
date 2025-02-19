@@ -175,6 +175,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
                 <Select
                   className="ml-5 w-auto"
                   value={greeting}
+                  popupMatchSelectWidth={false}
                   onSelect={(e) => setGreeting(e)}
                   suffixIcon
                 >
@@ -219,6 +220,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
                     className="w-auto"
                     allowClear
                     value={method}
+                    popupMatchSelectWidth={false}
                     suffixIcon
                     onSelect={(e) => setMethod(e)}
                   >

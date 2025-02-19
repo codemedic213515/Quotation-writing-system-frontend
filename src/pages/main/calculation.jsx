@@ -199,6 +199,7 @@ export function Calculation() {
           <div className="tab-content">
             {activeTab === 'select' && (
               <SelectQuotation
+              
                 setActiveTab={setActiveTab}
                 setNumber={setNumber}
               />
