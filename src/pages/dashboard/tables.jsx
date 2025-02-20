@@ -94,7 +94,7 @@ export function Tables() {
                           href="#"
                           className="text-xs font-semibold text-blue-gray-600"
                         >
-                          Edit
+                          操作
                         </Typography>
                       </td>
                     </tr>

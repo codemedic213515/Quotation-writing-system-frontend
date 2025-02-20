@@ -92,7 +92,7 @@ export function PostCode() {
 
   const columns = [
     {
-      title: 'PostCode',
+      title: '郵便番号',
       dataIndex: 'zipCode',
       key: 'zipCode',
       align: 'center',
@@ -152,13 +152,13 @@ export function PostCode() {
         ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       render: (_, record) =>
         editingKey === record.id ? (
-          <Button onClick={() => handleSave(record)}>Save</Button>
+          <Button onClick={() => handleSave(record)}>保存</Button>
         ) : (
-          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
+          <Button onClick={() => handleEdit(record.id)}>編集</Button>
         ),
     },
   ];
@@ -168,7 +168,7 @@ export function PostCode() {
       <Form layout="inline" className="mb-5 justify-center">
         <Form.Item>
           <Input
-            placeholder="PostCode"
+            placeholder="郵便番号"
             onChange={(e) => handleFilterChange('ZipCode', e.target.value)}
             className="w-auto"
             allowClear
@@ -179,7 +179,7 @@ export function PostCode() {
             showSearch
             allowClear
             popupMatchSelectWidth={false}
-            placeholder="Prefecture"
+            placeholder="県"
             className="w-auto"
             onChange={(value) => handleFilterChange('Prefecture', value)}
           >
@@ -194,7 +194,7 @@ export function PostCode() {
           <Select
             showSearch
             allowClear
-            placeholder="City"
+            placeholder="市"
             popupMatchSelectWidth={false}
             className="w-auto"
             onChange={(value) => handleFilterChange('City', value)}
