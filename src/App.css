@@ -1,0 +1,54 @@
+/* Import Google Fonts if not using local fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
+/* Local Font Setup (Optional: If using locally hosted fonts) */
+@font-face {
+  font-family: 'NotoSansJP';
+  src: url('/fonts/NotoSansJP-Regular.woff2') format('woff2'),
+       url('/fonts/NotoSansJP-Regular.woff') format('woff'),
+       url('/fonts/NotoSansJP-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply to everything globally */
+body {
+  font-family: 'NotoSansJP', sans-serif;
+}
+
+/* === ✅ Tailwind CSS Support === */
+.font-noto {
+  font-family: 'NotoSansJP', sans-serif;
+}
+
+/* === ✅ Ant Design (AntD) Components === */
+.ant-btn,
+.ant-input,
+.ant-select-selector,
+.ant-table,
+.ant-form-item-label,
+.ant-typography,
+.ant-float-btn-description,
+.ant-modal,
+.font-sans,
+.ant-menu,
+.ant-form-item-required, 
+.ant-radio,
+.ant-radio-wrapper,
+.ant-wave-target,
+.ant-form-item,
+.ant-form,
+.ant-checkbox {
+  font-family: 'NotoSansJP', sans-serif !important;
+}
+
+/* === ✅ Material UI (MUI) Components === */
+.MuiTypography-root,
+.MuiButton-root,
+.MuiSelect-root,
+.MuiInputBase-root,
+.MuiTable-root,
+.MuiMenu-root,
+.MuiDialog-root {
+  font-family: 'NotoSansJP', sans-serif !important;
+}
