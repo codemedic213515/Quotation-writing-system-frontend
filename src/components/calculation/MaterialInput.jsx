@@ -119,6 +119,7 @@ export function MaterialInput({ setActiveTab, number }) {
       align: 'center',
       render: (text, record) => (
         <Select
+        popupMatchSelectWidth={false}
           value={record.calculation}
           onChange={(value) =>
             handleInputChange(record.key, 'calculation', value)

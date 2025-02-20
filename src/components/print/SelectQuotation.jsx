@@ -137,6 +137,7 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
           <Select
             showSearch
             allowClear
+            popupMatchSelectWidth={false}
             placeholder="作成者名"
             options={users.map((user) => ({ label: user, value: user }))}
             onChange={(value) => handleFilterChange('creater', value)}

@@ -309,6 +309,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                             onSelect={(value) =>
                               handleCategory1Change(value, field.key, item.id)
                             }
+                            popupMatchSelectWidth={false}
                             options={category1Option.map((aa) => ({
                               label: aa.value,
                               value: aa.id,
@@ -328,6 +329,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                             onSelect={(value) =>
                               handleCategory2Change(value, field.key, item.id)
                             }
+                            popupMatchSelectWidth={false}
                             options={category2Option[
                               `${item.id}-${field.key}`
                             ]?.map((aa) => ({
@@ -349,6 +351,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                             onSelect={(value) =>
                               handleCategory3Change(value, field.key, item.id)
                             }
+                            popupMatchSelectWidth={false}
                             options={category3Option[
                               `${item.id}-${field.key}`
                             ]?.map((aa) => ({
@@ -363,7 +366,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         </Form.Item>
 
                         <Form.Item name={[field.name, 'unit']}>
-                          <Select placeholder="単位" options={unitOption} />
+                          <Select placeholder="単位" options={unitOption} popupMatchSelectWidth={false}/>
                         </Form.Item>
 
                         <Form.Item name={[field.name, 'externalCos']}>
@@ -380,6 +383,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
 
                         <Form.Item name={[field.name, 'categoryNam']}>
                           <Select
+                          popupMatchSelectWidth={false}
                             placeholder="分類名"
                             options={categoryOption}
                           />

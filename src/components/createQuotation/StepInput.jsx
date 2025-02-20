@@ -175,7 +175,8 @@ const StepInput = ({ setActiveTab, number }) => {
                       label="基本工種"
                       name={[field.name, '基本工種']}
                     >
-                      <Select allowClear options={options} />
+                      
+                      <Select allowClear popupMatchSelectWidth={false} options={options} />
                     </Form.Item>
 
                     <Form.Item label="部分工種">
@@ -200,6 +201,7 @@ const StepInput = ({ setActiveTab, number }) => {
                                 >
                                   <Select
                                     allowClear
+                                    popupMatchSelectWidth={false}
                                     placeholder="部分工種1"
                                     options={options}
                                     style={{ width: '100%' }}
@@ -213,6 +215,7 @@ const StepInput = ({ setActiveTab, number }) => {
                                   <Select
                                     allowClear
                                     placeholder="部分工種2"
+                                    popupMatchSelectWidth={false}
                                     options={options}
                                     style={{ width: '100%' }}
                                   />

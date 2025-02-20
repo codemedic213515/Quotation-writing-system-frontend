@@ -174,6 +174,7 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
         </Form.Item>
         <Form.Item label="作成者名">
           <Select
+          popupMatchSelectWidth={false}
             showSearch
             allowClear
             placeholder="作成者名"

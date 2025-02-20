@@ -178,6 +178,7 @@ export function PostCode() {
           <Select
             showSearch
             allowClear
+            popupMatchSelectWidth={false}
             placeholder="Prefecture"
             className="w-auto"
             onChange={(value) => handleFilterChange('Prefecture', value)}
@@ -194,6 +195,7 @@ export function PostCode() {
             showSearch
             allowClear
             placeholder="City"
+            popupMatchSelectWidth={false}
             className="w-auto"
             onChange={(value) => handleFilterChange('City', value)}
           >

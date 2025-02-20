@@ -1,3 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Local Font Setup */
+@font-face {
+  font-family: 'NotoSansJP';
+  src: url('/fonts/NotoSansJP-Regular.woff2') format('woff2'),
+       url('/fonts/NotoSansJP-Regular.woff') format('woff'),
+       url('/fonts/NotoSansJP-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply to everything globally */
+body {
+  font-family: 'NotoSansJP', sans-serif !important;
+}
+
+/* === ✅ Tailwind CSS Support === */
+.font-noto {
+  font-family: 'NotoSansJP', sans-serif !important;
+}
+
+/* === ✅ Ant Design (AntD) Components === */
+:root .ant-btn,
+:root .ant-input,
+:root .ant-select-selector,
+:root .ant-table,
+:root .ant-typography,
+:root .ant-modal,
+:root .ant-menu {
+  font-family: 'NotoSansJP', sans-serif !important;
+}
+
+/* === ✅ Material UI (MUI) Components === */
+:root .MuiTypography-root,
+:root .MuiButton-root,
+:root .MuiSelect-root,
+:root .MuiInputBase-root,
+:root .MuiTable-root,
+:root .MuiMenu-root,
+:root .MuiDialog-root {
+  font-family: 'NotoSansJP', sans-serif !important;
+}

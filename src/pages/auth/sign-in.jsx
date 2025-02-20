@@ -21,7 +21,7 @@ export function SignIn() {
   return (
     <AuthLayout>
       <div
-        className="min-h-screen flex items-center justify-center bg-cover bg-center"
+        className="font-noto min-h-screen flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: `url('/img/background.webp')` }}
       >
         <div className="flex w-full max-w-[900px] bg-[#00000080] backdrop-blur-sm border border-[#707070] rounded-lg shadow-2xl overflow-hidden">

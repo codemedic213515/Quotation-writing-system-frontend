@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Auth, Main, Master, Dashboard } from '@/layouts';
+import "./App.css"
 
 function App() {
   return (

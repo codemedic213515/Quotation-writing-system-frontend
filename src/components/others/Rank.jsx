@@ -118,9 +118,9 @@ export function Rank() {
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
       <Form>
         <div className="flex flex-row gap-4 mb-5 justify-center">
-          <Select showSearch allowClear placeholder="Name" className="w-1/4 " />
-          <Select showSearch allowClear placeholder="Group" className="w-1/4" />
-          <Select showSearch allowClear placeholder="AB材" className="w-1/4" />
+          <Select showSearch  popupMatchSelectWidth={false}allowClear placeholder="Name" className="w-1/4 " />
+          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="Group" className="w-1/4" />
+          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="AB材" className="w-1/4" />
         </div>
         <Form.Item>
           <CTable
