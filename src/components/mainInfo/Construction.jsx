@@ -120,14 +120,14 @@ export function Construction() {
         ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       align: 'center',
       render: (_, record) =>
         editingKey === record.id ? (
-          <Button onClick={() => handleSave(record)}>Save</Button>
+          <Button onClick={() => handleSave(record)}>削除</Button>
         ) : (
-          <Button onClick={() => handleEdit(record.id)}>Edit</Button>
+          <Button onClick={() => handleEdit(record.id)}>編集</Button>
         ),
     },
   ];

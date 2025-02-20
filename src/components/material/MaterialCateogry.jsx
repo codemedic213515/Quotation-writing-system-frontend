@@ -203,7 +203,7 @@ export function MaterialCategory() {
         ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       align: 'center',
       render: (_, record) =>
@@ -212,7 +212,7 @@ export function MaterialCategory() {
         ) : (
           <>
             <Button type="link" onClick={() => handleEdit(record.id)}>
-              Edit
+            編集
             </Button>
             <Button
               type="link"
@@ -222,7 +222,7 @@ export function MaterialCategory() {
                 setIsDeleteModalVisible(true);
               }}
             >
-              Delete
+              削除
             </Button>
           </>
         ),
