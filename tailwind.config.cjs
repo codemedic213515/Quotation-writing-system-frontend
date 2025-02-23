@@ -7,10 +7,7 @@ module.exports = withMT({
     extend: {
       fontFamily: {
         'noto': ['"Noto Sans JP"', 'sans-serif'],
-      },
-      fontSize: {
-        '24': '24px',
-      },
+      }
     },
   },
   plugins: [],

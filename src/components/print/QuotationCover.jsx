@@ -236,7 +236,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
                 <Text>備 考: {des}</Text>
               </div>
             </div>
-            <div className="w-2/6">
+            <div className="w-2/5">
               <div className="flex flex-col ">
                 <div className="p-10">
                   <div className="text-lg flex justify-between">
