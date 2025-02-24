@@ -292,7 +292,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
           </div>
           <TextArea rows={2} className="text-lg mt-2 rounded-none" />
         </Card>
-        <div className=" w-2/5">
+        <div className=" w-2/6">
           <Card className="mt-10 items-center ">
             <Typography>消費税を表示</Typography>
             <Radio.Group
