@@ -102,22 +102,6 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
     }
   };
 
-  // const fetchCategory4 = async (
-  //   category1Id,
-  //   category2Id,
-  //   category3Id,
-  //   index,
-  // ) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `api/category4?category1=${category1Id}&category2=${category2Id}&category3=${category3Id}`,
-  //     );
-  //     setCategory4Option((prev) => ({ ...prev, [index]: response.data }));
-  //   } catch (error) {
-  //     console.error('Error fetching category4:', error);
-  //   }
-  // };
-
   const fetchMaterials = async (
     category1Id,
     category2Id,
@@ -171,7 +155,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
         },
       },
     });
-    fetchCategory2(value, `${cardId}-${fieldKey}`);
+    fetchCategory2(value.split('*')[1], `${cardId}-${fieldKey}`);
   };
 
   const handleCategory2Change = (value, fieldKey, cardId) => {
@@ -188,8 +172,8 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
       },
     });
     fetchCategory3(
-      current[fieldKey]?.category1,
-      value,
+      current[fieldKey]?.category1.split('*')[1],
+      value.split('*')[1],
       `${cardId}-${fieldKey}`,
     );
   };
@@ -206,10 +190,10 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
         },
       },
     });
-    const category1Id = current[fieldKey]?.category1;
-    const category2Id = current[fieldKey]?.category2;
+    const category1Id = current[fieldKey]?.category1.split('*')[1];
+    const category2Id = current[fieldKey]?.category2.split('*')[1];
 
-    fetchMaterials(category1Id, category2Id, value, fieldKey, cardId);
+    fetchMaterials(category1Id, category2Id, value.split('*')[1], fieldKey, cardId);
     // fetchCategory4(category1Id, category2Id, value, cardId`${}-${fieldKey}`);
     console.log(current);
   };
@@ -227,9 +211,9 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
       data[typeId].forEach((material) => {
         result.push({
           TypeId: parseInt(typeId), // Matches backend field name
-          Category1: material.category1.toString(),
-          Category2: material.category2.toString(),
-          Category3: material.category3.toString(),
+          Category1: material.category1.split('*')[0].toString(),
+          Category2: material.category2.split('*')[0].toString(),
+          Category3: material.category3.split('*')[0].toString(),
           Category4: material.category4 || '', // Ensure this is present
           Quantity: material.quantity || '',
           Unit: material.unit || '',
@@ -312,7 +296,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                             popupMatchSelectWidth={false}
                             options={category1Option.map((aa) => ({
                               label: aa.value,
-                              value: aa.id,
+                              value: aa.value+"*"+aa.id,
                             }))}
                           />
                         </Form.Item>
@@ -334,7 +318,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                               `${item.id}-${field.key}`
                             ]?.map((aa) => ({
                               label: aa.name,
-                              value: aa.category2,
+                              value: aa.name+"*"+aa.category2,
                             }))}
                           />
                         </Form.Item>
@@ -356,7 +340,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                               `${item.id}-${field.key}`
                             ]?.map((aa) => ({
                               label: aa.name,
-                              value: aa.category3,
+                              value: aa.name+"*"+aa.category3,
                             }))}
                           />
                         </Form.Item>

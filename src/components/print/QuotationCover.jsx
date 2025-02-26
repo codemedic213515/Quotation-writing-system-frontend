@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
-import CoverPDF from './CoverPDF';
+import CoverPDF from './component/CoverPDF';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -103,11 +103,11 @@ const QuotationCover = ({ number, setActiveTab }) => {
   useEffect(() => {
     setNet(Math.round((netRate * quotationPrice) / 100));
   }, [netRate, quotationPrice]);
-  const getQuotationMain = async (number) => {
+  const getQuotationMain = async () => {    
     try {
       const response = await axios.get('/api/quotationmain', {
         params: {
-          number: number,
+          code: number,
         },
       });
       console.log('response: ', response.data.data);
@@ -365,15 +365,15 @@ const QuotationCover = ({ number, setActiveTab }) => {
               onClick={generatePDF}
             >
               Download PDF
-            </Button>,
+            </Button>
           ]}
           width={900}
         >
           <div ref={pdfRef}>
-            <CoverPDF data={data} />
+            <CoverPDF data={data}/>
           </div>
         </Modal>
-      </div>{' '}
+      </div>
     </div>
   );
 };
