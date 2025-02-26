@@ -1,9 +1,10 @@
-import { Button, Card, Input, InputNumber, Radio, Table } from 'antd';
+import { Button, Card, Input, InputNumber, Radio, Table ,Modal} from 'antd';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { useEffect, useState } from 'react';
-
+import html2pdf from 'html2pdf.js';
+import { useEffect, useState, useRef} from 'react';
+import Detail from "./component/Detail"
 const Detailed = ({ number, setActiveTab }) => {
   if (number === '') {
     setActiveTab('select');
@@ -38,7 +39,7 @@ const Detailed = ({ number, setActiveTab }) => {
   const [specialSelect, setSpecialSelect] = useState(false);
 
   const [tableData, setTableData] = useState([]);
-
+  const [modalVisible, setModalVisible] = useState(false);
   const columns = [
     { title: 'No.', dataIndex: 'no', key: 'no', align: 'center', width: 50 },
     {
@@ -86,13 +87,20 @@ const Detailed = ({ number, setActiveTab }) => {
       width: 100,
     },
   ];
-
+  const openModal = () => {
+    setModalVisible(true);
+  };
+  const closeModal = () => {
+    setModalVisible(false);
+  };
   const fetchTypes = async () => {
     try {
       const response = await axios.get('/api/quotationtype', {
         params: { number: number },
       });
+      console.log("Types : ", response.data);
       return response.data;
+      
     } catch (error) {
       console.error('Error fetching types:', error);
       return [];
@@ -104,6 +112,8 @@ const Detailed = ({ number, setActiveTab }) => {
       const response = await axios.get('/api/quotationprice/type', {
         params: { quotationNumber: number },
       });
+      console.log("Prices : ", response.data);
+      
       return response.data;
     } catch (error) {
       console.error('Error fetching prices:', error);
@@ -559,9 +569,28 @@ const Detailed = ({ number, setActiveTab }) => {
     // Save PDF
     doc.save(`Quotation_${number}.pdf`);
   };
-  const selectType = async () => {
-    console.log(tableData);
-  };
+   const pdfRef = useRef();
+   const generateDetail = () => {
+     const element = pdfRef.current;
+     if (element) {
+       html2pdf()
+         .from(element)
+         .set({
+           margin: 20,
+           filename: `${number}.pdf`,
+           image: { type: 'png', quality: 0.98 },
+           html2canvas: { scale: 2, useCORS: true },
+           jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+         })
+         .save(`${number}.pdf`)
+         .outputPdf('blob') // ✅ Output as blob
+         .then((pdfBlob) => {
+           const blobUrl = URL.createObjectURL(pdfBlob);
+           window.open(blobUrl, '_blank'); // ✅ Open in a new tab
+         });
+     }
+     closeModal();
+   };
   return (
     <div className="w-full p-6 bg-white ">
       <div className="flex w-full gap-4">
@@ -580,8 +609,10 @@ const Detailed = ({ number, setActiveTab }) => {
         <div className="w-1/4 flex flex-col gap-2 items-center h-[55vh] overflow-auto ">
           <h1 className="text-center font-bold text-lg">編集</h1>
           <div className="flex gap-2">
-            <Button onClick={generatePDF}>Print PDF</Button>
-            <Button onClick={selectType}>工種選択出力</Button>
+            <Button onClick={generatePDF}>工種別内訳表</Button>
+            <Button     onClick={() => {
+              openModal();
+            }}>内訳明細書</Button>
           </div>
           <Card bodyStyle={{ padding: '6px' }} className="w-full px-2">
             <div className="flex flex-row items-center ">
@@ -754,8 +785,35 @@ const Detailed = ({ number, setActiveTab }) => {
               </div>
             </div>
           </Card>
+         
         </div>
       </div>
+      <Modal
+          title="工 種 別 内 訳 表"
+          open={modalVisible}
+          onCancel={closeModal}
+          footer={[
+            <Button key="close" onClick={closeModal}>
+              Close
+            </Button>,
+            <Button
+              key="download"
+              shape="square"
+              type="primary"
+              className="bg-blue-600"
+              onClick={generateDetail}
+            >
+              Download PDF
+            </Button>,
+          ]}
+          width={900}
+        >
+          <div ref={pdfRef}>
+            <Detail 
+            // data={data}
+            />
+          </div>
+        </Modal>
     </div>
   );
 };
