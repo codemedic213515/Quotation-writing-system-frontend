@@ -1,10 +1,9 @@
-import { Button, Card, Input, InputNumber, Radio, Table ,Modal} from 'antd';
+import { Button, Card, Input, InputNumber, Radio, Table } from 'antd';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import html2pdf from 'html2pdf.js';
-import { useEffect, useState, useRef} from 'react';
-import Detail from "./component/Detail"
+import { useEffect, useState} from 'react';
+
 const Detailed = ({ number, setActiveTab }) => {
   if (number === '') {
     setActiveTab('select');
@@ -39,7 +38,8 @@ const Detailed = ({ number, setActiveTab }) => {
   const [specialSelect, setSpecialSelect] = useState(false);
 
   const [tableData, setTableData] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [detailedData, setDetailedData]= useState([]);
+
   const columns = [
     { title: 'No.', dataIndex: 'no', key: 'no', align: 'center', width: 50 },
     {
@@ -87,12 +87,7 @@ const Detailed = ({ number, setActiveTab }) => {
       width: 100,
     },
   ];
-  const openModal = () => {
-    setModalVisible(true);
-  };
-  const closeModal = () => {
-    setModalVisible(false);
-  };
+
   const fetchTypes = async () => {
     try {
       const response = await axios.get('/api/quotationtype', {
@@ -125,86 +120,76 @@ const Detailed = ({ number, setActiveTab }) => {
     let formattedData = [];
     let totalAmount = 0;
     let rowIndex = 1;
-
-    types.forEach((type) => {
+  
+    const getAmount = (type) => {
       const priceData = prices.find((p) => p.quotationTypeId === type.id);
-      const amount = priceData ? Math.round(priceData.totalProposalCost) : 0;
-      totalAmount += Math.round(amount);
-
-      if (type.category1 && !type.category2 && !type.category3) {
-        // Only category1 (No category2, No category3)
-        formattedData.push({
+      return priceData ? Math.round(priceData.totalProposalCost) : 0;
+    };
+  
+    const categoryMap = {};
+  
+    types.forEach((type) => {
+      const amount = getAmount(type);
+      totalAmount += amount;
+  
+      if (!categoryMap[type.category1]) {
+        categoryMap[type.category1] = {
           key: rowIndex,
           no: `${rowIndex}`,
           item: type.category1,
-          quantity: 1,
-          unit: '式',
-          unitPrice: '',
-          amount: amount,
-          remarks: '',
-        });
-      } else if (type.category1 && type.category2 && !type.category3) {
-        // category1 -> category2 (No category3)
-        formattedData.push({
-          key: rowIndex,
-          no: `${rowIndex}`,
-          item: type.category1,
-          quantity: '',
-          unit: '',
-          unitPrice: '',
-          amount: '',
-          remarks: '',
-        });
-
-        formattedData.push({
-          key: `${rowIndex}-1`,
-          no: `${rowIndex}-1`,
-          item: type.category2,
-          quantity: 1,
-          unit: '式',
-          unitPrice: '',
-          amount: amount,
-          remarks: '',
-        });
-      } else if (type.category1 && type.category2 && type.category3) {
-        // category1 -> category2 -> category3
-        formattedData.push({
-          key: rowIndex,
-          no: `${rowIndex}`,
-          item: type.category1,
-          quantity: '',
-          unit: '',
-          unitPrice: '',
-          amount: '',
-          remarks: '',
-        });
-
-        formattedData.push({
-          key: `${rowIndex}-1`,
-          no: `${rowIndex}-1`,
-          item: type.category2,
-          quantity: '',
-          unit: '',
-          unitPrice: '',
-          amount: '',
-          remarks: '',
-        });
-
-        formattedData.push({
-          key: `${rowIndex}-1-1`,
-          no: `${rowIndex}-1-1`,
-          item: type.category3,
-          quantity: 1,
-          unit: '式',
-          unitPrice: '',
-          amount: amount,
-          remarks: '',
-        });
+          quantity: "",
+          unit: "",
+          unitPrice: "",
+          amount: "",
+          remarks: "",
+          children: {},
+        };
+        rowIndex++;
       }
-
-      rowIndex++;
+  
+      if (type.category2) {
+        if (!categoryMap[type.category1].children[type.category2]) {
+          const subIndex = Object.keys(categoryMap[type.category1].children).length + 1;
+          categoryMap[type.category1].children[type.category2] = {
+            key: `${categoryMap[type.category1].key}-${subIndex}`,
+            no: `${categoryMap[type.category1].key}-${subIndex}`,
+            item: type.category2,
+            quantity: "",
+            unit: "",
+            unitPrice: "",
+            amount: "",
+            remarks: "",
+            children: {},
+          };
+        }
+  
+        if (type.category3) {
+          const subSubIndex =
+            Object.keys(categoryMap[type.category1].children[type.category2].children).length + 1;
+          categoryMap[type.category1].children[type.category2].children[type.category3] = {
+            key: `${categoryMap[type.category1].children[type.category2].key}-${subSubIndex}`,
+            no: `${categoryMap[type.category1].children[type.category2].key}-${subSubIndex}`,
+            item: type.category3,
+            quantity: 1,
+            unit: "式",
+            unitPrice: "",
+            amount: amount,
+            remarks: "",
+          };
+        }
+      }
     });
-
+  
+    Object.values(categoryMap).forEach((category1, i) => {
+      formattedData.push({key:category1.key,no:category1.no, item:category1.item, quantity:category1.quantity, unit:category1.unit, unitPrice:category1.unitPrice, amount:category1.amount, remarks:category1.remarks});
+      Object.values(category1.children).forEach((category2) => {
+        formattedData.push({key:category2.key,no:category2.no, item:category2.item, quantity:category2.quantity, unit:category2.unit, unitPrice:category2.unitPrice, amount:category2.amount, remarks:category2.remarks});
+        Object.values(category2.children).forEach((category3) => {
+          formattedData.push({key:category3.key,no:category3.no, item:category3.item, quantity:category3.quantity, unit:category3.unit, unitPrice:category3.unitPrice, amount:category3.amount, remarks:category3.remarks});
+        });
+      });
+    });
+  
     if (addition1Select == true && addtion1Name != '') {
       formattedData.push({
         key: 'addition1',
@@ -403,9 +388,112 @@ const Detailed = ({ number, setActiveTab }) => {
         (item) => item.item !== '改 め 合 計',
       );
     }
+    
     return formattedData;
   };
-
+  const formatQuotationData = ( prices) => {
+    let formattedData = [];
+    let totalAmount = 0;
+    let rowIndex = 1;
+  
+    prices.forEach((quote) => {
+      totalAmount+=quote.totalProposalCost
+      // Add main category row
+      formattedData.push({
+        key: rowIndex,
+        no: rowIndex,
+        item: quote.category3,
+        quantity: 1,
+        unit: "式",
+        unitPrice: "",
+        amount: "",
+        remarks: "",
+      });
+  
+      // Add materials
+      quote.materials.forEach((material) => {
+        formattedData.push({
+          key: "",
+          no: "",
+          item: `${material.category1}    ${material.category2} ${material.category3}`,
+          quantity: material.quantity,
+          unit: material.unit,
+          unitPrice: "",
+          amount: material.amount,
+          remarks: "",
+        });
+      });
+  
+      // Add cost breakdown
+      formattedData.push(
+        {
+          key: "",
+          no: "",
+          item: "労務費",
+          quantity: "",
+          unit: "式",
+          unitPrice: "",
+          amount: quote.laborCost,
+          remarks: "",
+        },
+        {
+          key: "",
+          no: "",
+          item: "現場雑費",
+          quantity: "",
+          unit: "式",
+          unitPrice: "",
+          amount: Math.round(quote.overheadCost + quote.miscellaneousCost),
+          remarks: "",
+        },
+        {
+          key: "",
+          no: "",
+          item: "諸経費",
+          quantity: "",
+          unit: "式",
+          unitPrice: "",
+          amount: Math.round(quote.generalExpenses),
+          remarks: "",
+        },
+        {
+          key: "",
+          no: "",
+          item: `*${quote.category3}*  小　計`,
+          quantity: "",
+          unit: "",
+          unitPrice: "",
+          amount: Math.round(quote.totalProposalCost),
+          remarks: "",
+        }
+      );
+  
+      rowIndex++;
+    });
+    formattedData.push(
+      {
+        key: '',
+        no: '',
+        item: '',
+        quantity: '',
+        unit: '',
+        unitPrice: '',
+        amount: '',
+        remarks: '',
+      },
+      {
+        key: 'total',
+        no: '',
+        item: '合 計',
+        quantity: 1,
+        unit: '式',
+        unitPrice: '',
+        amount: Math.round(totalAmount),
+        remarks: '',
+      },
+    );
+    return formattedData;
+  };
   useEffect(() => {
     const fetchData = async () => {
       if (!number) return;
@@ -415,9 +503,8 @@ const Detailed = ({ number, setActiveTab }) => {
 
       setTypes(fetchedTypes);
       setPrices(fetchedPrices);
-      console.log(types, prices);
-
       setTableData(formatDataForTable(fetchedTypes, fetchedPrices));
+      setDetailedData(formatQuotationData(fetchedTypes, fetchedPrices))
     };
 
     fetchData();
@@ -448,6 +535,9 @@ const Detailed = ({ number, setActiveTab }) => {
     types,
     prices,
   ]);
+  useEffect(()=>{
+    setDetailedData(formatQuotationData( prices))
+  },[ prices])
   console.log(tableData);
 
   const generatePDF = async () => {
@@ -462,7 +552,6 @@ const Detailed = ({ number, setActiveTab }) => {
       format: 'a4',
     });
 
-    // Fetch and load the font dynamically
     const fontResponse = await fetch(
       'https://fonts.gstatic.com/s/notosansjp/v52/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75s.ttf',
     );
@@ -478,14 +567,12 @@ const Detailed = ({ number, setActiveTab }) => {
     doc.addFont('NotoSansJP-Regular.ttf', 'NotoSansJP', 'normal');
     doc.setFont('NotoSansJP');
 
-    // Header
     doc.setFontSize(16);
     doc.setTextColor(0, 0, 0);
     doc.text('工 種 別 内 訳 表', doc.internal.pageSize.width / 2, 15, {
       align: 'center',
     });
 
-    // Define Table Columns
     const tableColumn = [
       'No.',
       '項 目 ・ 形 状 寸 法',
@@ -497,7 +584,6 @@ const Detailed = ({ number, setActiveTab }) => {
     ];
     const tableRows = [];
 
-    // Format Table Data
     tableData.forEach((row) => {
       tableRows.push([
         row.no || '',
@@ -510,7 +596,6 @@ const Detailed = ({ number, setActiveTab }) => {
       ]);
     });
 
-    // Table Styling
     doc.autoTable({
       startY: 25,
       head: [tableColumn],
@@ -551,7 +636,6 @@ const Detailed = ({ number, setActiveTab }) => {
       margin: { left: 10, right: 10 },
     });
 
-    // Footer (Page Numbering)
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -566,30 +650,121 @@ const Detailed = ({ number, setActiveTab }) => {
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, '_blank');
-    // Save PDF
     doc.save(`Quotation_${number}.pdf`);
   };
-   const pdfRef = useRef();
-   const generateDetail = () => {
-     const element = pdfRef.current;
-     if (element) {
-       html2pdf()
-         .from(element)
-         .set({
-           margin: 20,
-           filename: `${number}.pdf`,
-           image: { type: 'png', quality: 0.98 },
-           html2canvas: { scale: 2, useCORS: true },
-           jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-         })
-         .save(`${number}.pdf`)
-         .outputPdf('blob') // ✅ Output as blob
-         .then((pdfBlob) => {
-           const blobUrl = URL.createObjectURL(pdfBlob);
-           window.open(blobUrl, '_blank'); // ✅ Open in a new tab
-         });
-     }
-     closeModal();
+
+   const generateDetail = async () => {
+    if (!Array.isArray(detailedData) || detailedData.length === 0) {
+      console.error('Error: tableData is undefined or not an array.');
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const fontResponse = await fetch(
+      'https://fonts.gstatic.com/s/notosansjp/v52/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75s.ttf',
+    );
+    const fontBuffer = await fontResponse.arrayBuffer();
+    const fontBase64 = btoa(
+      new Uint8Array(fontBuffer).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        '',
+      ),
+    );
+
+    doc.addFileToVFS('NotoSansJP-Regular.ttf', fontBase64);
+    doc.addFont('NotoSansJP-Regular.ttf', 'NotoSansJP', 'normal');
+    doc.setFont('NotoSansJP');
+
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('内 訳 明 細 書', doc.internal.pageSize.width / 2, 15, {
+      align: 'center',
+    });
+
+    const tableColumn = [
+      'No.',
+      '項 目 ・ 形 状 寸 法',
+      '数量',
+      '単位',
+      '単価',
+      '金額',
+      '摘要',
+    ];
+    const tableRows = [];
+
+    detailedData.forEach((row) => {
+      tableRows.push([
+        row.no || '',
+        row.item || '',
+        row.quantity || '',
+        row.unit || '',
+        row.unitPrice ? `¥${row.unitPrice.toLocaleString()}` : '',
+        row.amount ? `¥${row.amount.toLocaleString()}` : '',
+        row.remarks || '',
+      ]);
+    });
+
+    doc.autoTable({
+      startY: 25,
+      head: [tableColumn],
+      body: tableRows,
+      styles: {
+        font: 'NotoSansJP',
+        fontSize: 10,
+        textColor: [0, 0, 0],
+        halign: 'center',
+        valign: 'middle',
+        lineWidth: 0.4,
+        lineColor: [0, 0, 0], // Black border
+        fillColor: [255, 255, 255], // White background
+      },
+      headStyles: {
+        fillColor: [255, 255, 255], // White header
+        textColor: [0, 0, 0], // Black text
+        fontSize: 12,
+        fontStyle: 'bold',
+        halign: 'center',
+        valign: 'middle',
+        lineWidth: 0.4,
+        lineColor: [0, 0, 0], // Black header border
+      },
+      alternateRowStyles: {
+        fillColor: [255, 255, 255], // Keep alternating rows white
+      },
+      columnStyles: {
+        0: { cellWidth: 15, halign: 'center' }, // No.
+        1: { cellWidth: 120, halign: 'left' }, // 項 目 ・ 形 状 寸 法
+        2: { cellWidth: 20, halign: 'right' }, // 数量
+        3: { cellWidth: 20, halign: 'center' }, // 単位
+        4: { cellWidth: 25, halign: 'right' }, // 単価
+        5: { cellWidth: 30, halign: 'right' }, // 金額
+        6: { cellWidth: 50, halign: 'left' }, // 摘要
+      },
+      theme: 'grid',
+      margin: { left: 10, right: 10 },
+    });
+
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `E-${i}頁`,
+        doc.internal.pageSize.width - 20,
+        doc.internal.pageSize.height - 10,
+        { align: 'right' },
+      );
+    }
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, '_blank');
+    doc.save(`Detailed
+      -${number}.pdf`);
    };
   return (
     <div className="w-full p-6 bg-white ">
@@ -610,9 +785,7 @@ const Detailed = ({ number, setActiveTab }) => {
           <h1 className="text-center font-bold text-lg">編集</h1>
           <div className="flex gap-2">
             <Button onClick={generatePDF}>工種別内訳表</Button>
-            <Button     onClick={() => {
-              openModal();
-            }}>内訳明細書</Button>
+            <Button     onClick={generateDetail}>内訳明細書</Button>
           </div>
           <Card bodyStyle={{ padding: '6px' }} className="w-full px-2">
             <div className="flex flex-row items-center ">
@@ -785,35 +958,8 @@ const Detailed = ({ number, setActiveTab }) => {
               </div>
             </div>
           </Card>
-         
         </div>
       </div>
-      <Modal
-          title="工 種 別 内 訳 表"
-          open={modalVisible}
-          onCancel={closeModal}
-          footer={[
-            <Button key="close" onClick={closeModal}>
-              Close
-            </Button>,
-            <Button
-              key="download"
-              shape="square"
-              type="primary"
-              className="bg-blue-600"
-              onClick={generateDetail}
-            >
-              Download PDF
-            </Button>,
-          ]}
-          width={900}
-        >
-          <div ref={pdfRef}>
-            <Detail 
-            // data={data}
-            />
-          </div>
-        </Modal>
     </div>
   );
 };
