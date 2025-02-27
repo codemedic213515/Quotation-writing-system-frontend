@@ -13,7 +13,6 @@ import {
   TagIcon,
   AdjustmentsHorizontalIcon,
   QueueListIcon,
-  CpuChipIcon,
 } from '@heroicons/react/24/solid';
 import SelectQuotation from '@/components/print/SelectQuotation';
 import QuotationCover from '@/components/print/QuotationCover';
@@ -21,7 +20,6 @@ import Detailed from '@/components/print/Detailed';
 import Classification from '@/components/print/Classification';
 import SummaryTable from '@/components/print/SummaryTable';
 import QuotationList from '@/components/print/QuotationList';
-import CoefficientList from '@/components/print/CoefficientList';
 
 export function Print() {
   const [activeTab, setActiveTab] = useState('select');
@@ -46,9 +44,7 @@ export function Print() {
                 : activeTab === 'summary'
                 ? '総括表'
                 : activeTab === 'list'
-                ? '見積一覧表'
-                : activeTab === 'coefficient'
-                ? '係数一覧表'
+                ? '実行予算表'
                 : ''}
             </div>
             <div className="text-lg">
@@ -127,19 +123,7 @@ export function Print() {
                     } w-auto `}
                   >
                     <QueueListIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    見積一覧表
-                  </Tab>
-                  <Tab
-                    value="coefficient"
-                    onClick={() => setActiveTab('coefficient')}
-                    className={`${
-                      activeTab === 'coefficient'
-                        ? 'active-tab font-bold text-[#00B3F4]'
-                        : 'text-blue-gray-500 font-bold'
-                    } w-auto `}
-                  >
-                    <CpuChipIcon className="-mt-1 mr-2 inline-block h-5 w-5" />
-                    係数一覧表
+                    実行予算表
                   </Tab>
                 </TabsHeader>
               </Tabs>
@@ -167,9 +151,6 @@ export function Print() {
             )}
             {activeTab === 'list' && (
               <QuotationList setActiveTab={setActiveTab} number={number} />
-            )}
-            {activeTab === 'coefficient' && (
-              <CoefficientList setActiveTab={setActiveTab} number={number} />
             )}
           </div>
         </CardBody>
