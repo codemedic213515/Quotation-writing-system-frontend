@@ -1,18 +1,17 @@
-import {Table, Button,  Card, } from 'antd'
-import axios from 'axios';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { useState, useEffect } from "react"
+import Total from "./component/Total"
 
-const Classification=({ number, setActiveTab })=> {
-  if (number == '') {
-    setActiveTab('select');
+const Classification = ({ number, setActiveTab }) => {
+  if (number == "") {
+    setActiveTab("select")
   }
+
+
   return (
-  <div>
-    <Button>Net</Button>
-    <Button>total</Button>
-    <Button>price</Button>
-  </div>
+    <div>
+      <Total/>
+    </div>
   )
 }
-export default Classification;
+
+export default Classification
