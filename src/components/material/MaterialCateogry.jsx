@@ -272,6 +272,7 @@ export function MaterialCategory() {
         loading={loading}
         rowKey="id"
         pagination={{
+          position:["bottomCenter"],
           current: filters.page,
           pageSize: filters.pageSize,
           total: total,
