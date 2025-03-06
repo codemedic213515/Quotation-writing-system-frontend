@@ -17,12 +17,14 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
   const [users, setUsers] = useState([]); // State to store users for filtering
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(5);
   const [totalRecords, setTotalRecords] = useState(0);
   const [filters, setFilters] = useState({
     creater: null,
     code: null,
     createDate: null,
+    page:1,
+    pageSize:5,
   });
 
   const fetchUsers = async () => {
@@ -67,9 +69,10 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
     fetchQuotations(); // Fetch quotations when the component mounts or when filters/page/size change
   }, [page, pageSize, filters]);
 
-  const handlePageChange = (newPage, newPageSize) => {
-    setPage(newPage);
-    setPageSize(newPageSize);
+  const handlePageChange = (pagination) => {
+    setPage(pagination.current) ;
+     setPageSize(pagination.pageSize );
+     setFilters((prev) => ({ ...prev, page: pagination.current }));
   };
 
   const handleFilterChange = (key, value) => {
@@ -190,8 +193,12 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
         rowKey="id"
         pagination={{
           position: ['bottomcenter'],
-          pageSize: 5,
+          current: filters.page,
+          pageSize: filters.pageSize,
+          total: totalRecords,
+          showSizeChanger: false,
         }}
+        onChange={handlePageChange}
       />
 
       <FloatButton

@@ -12,7 +12,7 @@ export function MaterialMaster() {
   const [selectedCategory2, setSelectedCategory2] = useState(null);
   const [selectedCategory3, setSelectedCategory3] = useState(null);
   const [selectedABCode, setSelectedABCode] = useState(null);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0,  });
 
   const fetchMaterialMasterData = async (params = {}) => {
     try {

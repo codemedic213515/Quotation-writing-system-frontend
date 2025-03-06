@@ -13,6 +13,8 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
     creater: null,
     code: null,
     createDate: null,
+    page:1,
+    pageSize:5,
   });
 
   const fetchUsers = async () => {
@@ -56,11 +58,11 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
     fetchQuotations();
   }, [page, pageSize, filters]);
 
-  const handlePageChange = (newPage, newPageSize) => {
-    setPage(newPage);
-    setPageSize(newPageSize);
+  const handlePageChange = (pagination) => {
+    setPage(pagination.current);
+    setPageSize(pagination.pageSize);
+    setFilters((prev) => ({ ...prev, page: pagination.current }));
   };
-
   const handleFilterChange = (key, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -151,8 +153,12 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
         rowKey="id"
         pagination={{
           position: ['bottomcenter'],
-          pageSize: 5,
+          current: filters.page,
+          pageSize: filters.pageSize,
+          total: totalRecords,
+          showSizeChanger: false,
         }}
+        onChange={handlePageChange}
       />
     </div>
   );
