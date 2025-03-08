@@ -122,16 +122,16 @@ console.log(data);
       ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       align: 'center',
       render: (text, record) => (
         editingKey === record.Id ? (
           <Button type="primary" onClick={() => saveChanges(record)}>
-            Save
+            保存
           </Button>
         ) : (
-          <Button onClick={() => setEditingKey(record.Id)}>Edit</Button>
+          <Button onClick={() => setEditingKey(record.Id)}>編集</Button>
         )
       ),
     },

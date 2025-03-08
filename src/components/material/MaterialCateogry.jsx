@@ -260,7 +260,7 @@ export function MaterialCategory() {
         onClick={() => setIsAddModalVisible(true)}
         className="mb-4 bg-blue "
       >
-        Add Material
+        追加
       </Button>
       </div>
 
