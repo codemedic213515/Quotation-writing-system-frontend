@@ -230,7 +230,7 @@ export function MaterialCategory() {
   ];
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between">
         <Form layout="inline">
           <Form.Item>
             <Input
@@ -256,15 +256,15 @@ export function MaterialCategory() {
             />
           </Form.Item>
         </Form>
-      </div>
-
-      <Button
-        type="primary"
+        <Button
         onClick={() => setIsAddModalVisible(true)}
-        className="mb-4"
+        className="mb-4 bg-blue "
       >
         Add Material
       </Button>
+      </div>
+
+    
 
       <Table
         columns={columns}
