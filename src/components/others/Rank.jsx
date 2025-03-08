@@ -1,144 +1,159 @@
-import { Form, Input, Select } from 'antd';
-import { useState } from 'react';
-import CTable from '../CTable';
+import { Form, Input, Button, Table, Modal, message } from 'antd';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 export function Rank() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [editingKey, setEditingKey] = useState(null);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState({ page: 1, pageSize: 5 });
 
-  const [selectedRowKey, setSelectedRowKey] = useState(null);
+  useEffect(() => {
+    fetchRankMasters();
+  }, [filters]);
 
-  const handleInputChange = (key, field, value) => {
-    const newData = data.map((item) => {
-      if (item.key === key) {
-        return { ...item, [field]: value };
-      }
-      return item;
-    });
-    setData(newData);
+  const fetchRankMasters = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/rank/rankdata', { params: filters });
+      setData(response.data.items);
+      setTotal(response.data.total);
+    } catch (error) {
+      message.error('Failed to load rank master data');
+    }
+    setLoading(false);
   };
 
-  const handleRowSelect = (record) => {
-    setSelectedRowKey(record.key);
+  const handleInputChange = (key, field, value) => {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === key ? { ...item, [field]: value } : item
+      )
+    );
+  };
+console.log(data);
+
+  const saveChanges = async (record) => {
+    try {
+      await axios.put(`/api/rank/${record.Id}`, record);
+      message.success('Updated successfully');
+      setEditingKey(null);
+      fetchRankMasters();
+    } catch (error) {
+      message.error('Update failed');
+    }
+  };
+
+  const handleTableChange = (pagination) => {
+    setFilters((prev) => ({ ...prev, page: pagination.current }));
   };
 
   const columns = [
     {
       title: 'No',
-      dataIndex: 'Id',
-      key: 'Id',
+      dataIndex: 'id',
+      key: 'id',
       align: 'center',
     },
     {
-      title: '分類名',
-      dataIndex: 'Name',
-      key: 'Name',
+      title: 'ランク',
+      dataIndex: 'name',
+      key: 'name',
       align: 'center',
       render: (text, record) => (
         <Input
-          value={record.Name}
-          onChange={(e) =>
-            handleInputChange(record.key, 'Name', e.target.value)
-          }
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
+          value={record.name}
+          onChange={(e) => handleInputChange(record.Id, 'name', e.target.value)}
+          disabled={editingKey !== record.Id}
         />
       ),
     },
     {
-      title: '乗率',
-      dataIndex: 'Rate',
-      key: 'Rate',
+      title: '労務単価A',
+      dataIndex: 'laborCostA',
+      key: 'laborCostA',
       align: 'center',
       render: (text, record) => (
         <Input
-          value={record.Rate}
-          onChange={(e) =>
-            handleInputChange(record.key, 'Rate', e.target.value)
-          }
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
-      ),
-    },
-
-    {
-      title: '原価率',
-      dataIndex: 'Cost',
-      key: 'Cost',
-      align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.Cost}
-          onChange={(e) => handleInputChange(record.key, 'Cost', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
+          value={record.laborCostA}
+          onChange={(e) => handleInputChange(record.Id, 'laborCostA', e.target.value)}
+          disabled={editingKey !== record.Id}
         />
       ),
     },
     {
-      title: '雑素率',
-      dataIndex: 'OtherRate',
-      key: 'OtherRate',
+      title: '労務単価B',
+      dataIndex: 'laborCostB',
+      key: 'laborCostB',
       align: 'center',
       render: (text, record) => (
         <Input
-          value={record.OtherRate}
-          onChange={(e) => handleInputChange(record.key, 'OtherRate', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
+          value={record.laborCostB}
+          onChange={(e) => handleInputChange(record.Id, 'laborCostB', e.target.value)}
+          disabled={editingKey !== record.Id}
         />
       ),
     },
     {
-      title: 'AB材',
-      dataIndex: 'ABCode',
-      key: 'ABCode',
+      title: '現場雑率',
+      dataIndex: 'siteMiscell',
+      key: 'siteMiscell',
       align: 'center',
       render: (text, record) => (
         <Input
-          value={record.ABCode}
-          onChange={(e) => handleInputChange(record.key, 'ABCode', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
+          value={record.siteMiscell}
+          onChange={(e) => handleInputChange(record.Id, 'siteMiscell', e.target.value)}
+          disabled={editingKey !== record.Id}
         />
+      ),
+    },
+    {
+      title: '諸経率',
+      dataIndex: 'otherExpens',
+      key: 'otherExpens',
+      align: 'center',
+      render: (text, record) => (
+        <Input
+          value={record.otherExpens}
+          onChange={(e) => handleInputChange(record.Id, 'otherExpens', e.target.value)}
+          disabled={editingKey !== record.Id}
+        />
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      align: 'center',
+      render: (text, record) => (
+        editingKey === record.Id ? (
+          <Button type="primary" onClick={() => saveChanges(record)}>
+            Save
+          </Button>
+        ) : (
+          <Button onClick={() => setEditingKey(record.Id)}>Edit</Button>
+        )
       ),
     },
   ];
 
-  const handleUpdate = () => {
-    if (selectedRowKey) {
-      const updatedRow = data.find((item) => item.key === selectedRowKey);
-      console.log('Updated row:', updatedRow);
-    } else {
-      console.log('No row selected for update.');
-    }
-  };
-
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
-      <Form>
-        <div className="flex flex-row gap-4 mb-5 justify-center">
-          <Select showSearch  popupMatchSelectWidth={false}allowClear placeholder="Name" className="w-1/4 " />
-          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="Group" className="w-1/4" />
-          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="AB材" className="w-1/4" />
-        </div>
-        <Form.Item>
-          <CTable
-            columns={columns}
-            dataSource={data}
-            pagination={false}
-            bordered
-            ps={5}
-            className="mb-4 border-collapse"
-            rowClassName={(record) =>
-              record.key === selectedRowKey ? 'bg-blue-100' : ''
-            }
-            onRow={(record) => ({
-              onClick: () => handleRowSelect(record),
-            })}
-          />
-        </Form.Item>
-      </Form>
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
+        loading={loading}
+        pagination={{
+          position: ['bottomCenter'],
+          current: filters.page,
+          pageSize: filters.pageSize,
+          total: total,
+          showSizeChanger: false,
+        }}
+        onChange={handleTableChange}
+        bordered
+      />
     </div>
   );
 }

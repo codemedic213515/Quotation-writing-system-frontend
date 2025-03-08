@@ -1,145 +1,142 @@
-import { Form, Input, Select } from 'antd';
-import { useState } from 'react';
-import CTable from '../CTable';
+import { Form, Input, Button, Table, Modal, message } from 'antd';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
-export function Unit() {
+export function UnitData() {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [filters, setFilters] = useState({ page: 1, pageSize: 5 });
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [newUnit, setNewUnit] = useState({ Name: '' });
 
-  const [selectedRowKey, setSelectedRowKey] = useState(null);
+  useEffect(() => {
+    fetchUnitData();
+  }, [filters]);
 
-  const handleInputChange = (key, field, value) => {
-    const newData = data.map((item) => {
-      if (item.key === key) {
-        return { ...item, [field]: value };
-      }
-      return item;
-    });
-    setData(newData);
+  const fetchUnitData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/unit/unitdata', { params: filters });
+      setData(response.data.items);
+      setTotal(response.data.total);
+    } catch (error) {
+      message.error('Failed to load unit master data');
+    }
+    setLoading(false);
   };
 
-  const handleRowSelect = (record) => {
-    setSelectedRowKey(record.key);
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/api/unit/${selectedRow.id}`);
+      message.success('Unit deleted successfully');
+      setIsDeleteModalVisible(false);
+      fetchUnitData();
+    } catch (error) {
+      message.error('Failed to delete unit');
+    }
+  };
+
+  const handleAddNew = async () => {
+    try {
+      const response = await axios.post('/api/unit', newUnit);
+      if (response.status === 201) {
+        message.success('Unit added successfully');
+        setIsAddModalVisible(false);
+        fetchUnitData();
+        setNewUnit({ Name: '' });
+      }
+    } catch (error) {
+      message.error('Failed to add unit');
+    }
+  };
+
+  const handleTableChange = (pagination) => {
+    setFilters((prev) => ({ ...prev, page: pagination.current }));
   };
 
   const columns = [
     {
       title: 'No',
-      dataIndex: 'Id',
-      key: 'Id',
+      dataIndex: 'id',
+      key: 'id',
       align: 'center',
     },
     {
-      title: '分類名',
-      dataIndex: 'Name',
-      key: 'Name',
+      title: 'Unit Name',
+      dataIndex: 'name',
+      key: 'name',
       align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.Name}
-          onChange={(e) =>
-            handleInputChange(record.key, 'Name', e.target.value)
-          }
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
-      ),
     },
     {
-      title: '乗率',
-      dataIndex: 'Rate',
-      key: 'Rate',
+      title: 'Actions',
+      key: 'actions',
       align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.Rate}
-          onChange={(e) =>
-            handleInputChange(record.key, 'Rate', e.target.value)
-          }
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
-      ),
-    },
-
-    {
-      title: '原価率',
-      dataIndex: 'Cost',
-      key: 'Cost',
-      align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.Cost}
-          onChange={(e) => handleInputChange(record.key, 'Cost', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
-      ),
-    },
-    {
-      title: '雑素率',
-      dataIndex: 'OtherRate',
-      key: 'OtherRate',
-      align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.OtherRate}
-          onChange={(e) => handleInputChange(record.key, 'OtherRate', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
-      ),
-    },
-    {
-      title: 'AB材',
-      dataIndex: 'ABCode',
-      key: 'ABCode',
-      align: 'center',
-      render: (text, record) => (
-        <Input
-          value={record.ABCode}
-          onChange={(e) => handleInputChange(record.key, 'ABCode', e)}
-          className="w-auto"
-          disabled={selectedRowKey !== record.key}
-        />
+      render: (_, record) => (
+        <>
+          <Button
+            type="link"
+            danger
+            onClick={() => {
+              setSelectedRow(record);
+              setIsDeleteModalVisible(true);
+            }}
+          >
+            Delete
+          </Button>
+        </>
       ),
     },
   ];
 
-  const handleUpdate = () => {
-    if (selectedRowKey) {
-      const updatedRow = data.find((item) => item.key === selectedRowKey);
-      console.log('Updated row:', updatedRow);
-    } else {
-      console.log('No row selected for update.');
-    }
-  };
-
   return (
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
-      <Form>
-        <div className="flex flex-row gap-4 mb-5 justify-center">
-          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="Name" className="w-1/4 " />
-          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="Group" className="w-1/4" />
-          <Select showSearch popupMatchSelectWidth={false} allowClear placeholder="AB材" className="w-1/4" />
-        </div>
-        <Form.Item>
-          <CTable
-            columns={columns}
-            dataSource={data}
-            pagination={false}
-            bordered
-            ps={5}
-            className="mb-4 border-collapse"
-            rowClassName={(record) =>
-              record.key === selectedRowKey ? 'bg-blue-100' : ''
-            }
-            onRow={(record) => ({
-              onClick: () => handleRowSelect(record),
-            })}
-          />
-        </Form.Item>
-      </Form>
+      <div className="mb-4 flex justify-between">
+        <Button onClick={() => setIsAddModalVisible(true)} className="mb-4 bg-blue">
+          Add Unit
+        </Button>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
+        loading={loading}
+        pagination={{
+          position: ['bottomCenter'],
+          current: filters.page,
+          pageSize: filters.pageSize,
+          total: total,
+          showSizeChanger: false,
+        }}
+        bordered
+        onChange={handleTableChange}
+      />
+      <Modal
+        title="Add New Unit"
+        open={isAddModalVisible}
+        onCancel={() => setIsAddModalVisible(false)}
+        onOk={handleAddNew}
+      >
+        <Form layout="vertical">
+          <Form.Item label="Unit Name">
+            <Input
+              value={newUnit.Name}
+              onChange={(e) => setNewUnit({ ...newUnit, Name: e.target.value })}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title="Confirm Delete"
+        open={isDeleteModalVisible}
+        onCancel={() => setIsDeleteModalVisible(false)}
+        onOk={handleDelete}
+      >
+        <p>Are you sure you want to delete this unit?</p>
+      </Modal>
     </div>
   );
 }
-export default Unit;
+export default UnitData;
