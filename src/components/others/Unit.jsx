@@ -65,13 +65,13 @@ export function UnitData() {
       align: 'center',
     },
     {
-      title: 'Unit Name',
+      title: '単位',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       align: 'center',
       render: (_, record) => (
@@ -84,7 +84,7 @@ export function UnitData() {
               setIsDeleteModalVisible(true);
             }}
           >
-            Delete
+            削除
           </Button>
         </>
       ),
@@ -95,7 +95,7 @@ export function UnitData() {
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
       <div className="mb-4 flex justify-between">
         <Button onClick={() => setIsAddModalVisible(true)} className="mb-4 bg-blue">
-          Add Unit
+        追加
         </Button>
       </div>
       <Table

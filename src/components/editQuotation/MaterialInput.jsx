@@ -592,7 +592,7 @@ console.log(response.data);
                       </div>
                     ))}
                   </div>
-                  <Divider className="my-2">Add New Materials</Divider>
+                  <Divider className="my-2">追加材料</Divider>
                 </>
               )}
 

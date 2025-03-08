@@ -139,7 +139,7 @@ export function Construction() {
         onClick={handleAddNew}
         className="mb-4 bg-blue-400 float-right"
       >
-        Add New
+        追加
       </Button>
       <Table
         columns={columns}
