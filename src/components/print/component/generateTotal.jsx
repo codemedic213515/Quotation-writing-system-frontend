@@ -49,7 +49,7 @@ const generateTotal = async ({net, setIsGenerating, number, name, exp, imp, crea
         
         // Keep original header content
         doc.setFontSize(16);
-        doc.text("分 類 別 集 計 表 (Net)", 105, 15, { align: "center" });
+        doc.text("内 訳 明 細 集 計 表", 105, 15, { align: "center" });
         doc.setFontSize(10);
         doc.text("見 積 番 号：", 150, 15);
         doc.text(`${number}`, 180, 15);
