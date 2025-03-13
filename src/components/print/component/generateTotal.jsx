@@ -1,7 +1,7 @@
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 
-const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, creater, date}) => {
+const generateTotal = async ({net, setIsGenerating, number, name, exp, imp, creater, date}) => {
   
   const dateString = date;
   const newDate = new Date(dateString);
@@ -66,7 +66,19 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
         pageIndex++;
         
         // Define table header
-        const tableColumn = ["【  品  名  】", "【   形   状   ・   寸   法   】", "【単位】", "【数量】", "【単価】", "【 金 額 】", "【備考】"];
+        const tableColumn = [
+          "【 品 名 】",
+          "【 形 状 ・ 寸 法 】",
+          "【単位】",
+          "【数量 (A)】",
+          "【単価 (A)】",
+          "【金額 (A)】",
+          "【数量 (B)】",
+          "【単価 (B)】",
+          "【金額 (B)】",
+          "【歩掛】",
+          "【支給区分】"
+        ];
         const tableRows = [];
         
         rows.forEach(row => {
@@ -80,7 +92,7 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
               { content: row.unit || "", styles: { halign: "center", fontSize: 9 } },
               "",
               "",
-              { content: row.amount || "", styles: { halign: "center", fontSize: 9 } },
+              { content: "", styles: { halign: "center", fontSize: 9 } },
               ""
             ]);
           } else {
@@ -89,9 +101,13 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
               { content: row.subItem || "", styles: { halign: "center", fontSize: 9 } },
               { content: row.unit || "", styles: { halign: "center", fontSize: 9 } },
               { content: row.quantity || "", styles: { halign: "center", fontSize: 9 } },
-              { content: row.unitPrice || "", styles: { halign: "center", fontSize: 9 } },
-              { content: row.amount || "", styles: { halign: "center", fontSize: 9 } },
-              { content: row.notes || "", styles: { halign: "center", fontSize: 9 } }
+              { content: "", styles: { halign: "center", fontSize: 9 } },
+              { content:  "", styles: { halign: "center", fontSize: 9 } },
+              { content: row.quantity, styles: { halign: "center", fontSize: 9 } }, // 数量(B)
+              { content: "", styles: { halign: "center", fontSize: 9 } }, // 単価(B)
+              { content: "", styles: { halign: "center", fontSize: 9 } }, // 金額(B)
+              { content: "", styles: { halign: "center", fontSize: 9 } },
+              { content: "", styles: { halign: "center", fontSize: 9 } }
             ]);
           }
         });
@@ -113,7 +129,7 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
           headStyles: {
             fillColor: [255, 255, 255],
             textColor: [0, 0, 0],
-            fontSize: 9,
+            fontSize: 7,
             fontStyle: "bold",
             halign: "center",
             valign: "middle",
@@ -122,13 +138,17 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
             cellPadding: 2,
           },
           columnStyles: {
-            0: { cellWidth: 45 },
-            1: { cellWidth: 80 },
-            2: { cellWidth: 20 },
-            3: { cellWidth: 25 },
-            4: { cellWidth: 25 },
-            5: { cellWidth: 35 },
-            6: { cellWidth: 25 },
+            0: { cellWidth: 30 },
+            1: { cellWidth: 40 },
+            2: { cellWidth: 15 },
+            3: { cellWidth: 20 },
+            4: { cellWidth: 20 },
+            5: { cellWidth: 25 },
+            6: { cellWidth: 20 },
+            7: { cellWidth: 20 },
+            8: { cellWidth: 25 },
+            9: { cellWidth: 20 },
+            10: { cellWidth: 20 }
           },
           theme: "plain",
           margin: { left: 10, right: 10 },
@@ -148,7 +168,7 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
               data.row.index === data.length - 2 ||
               (data.row.raw && data.row.raw[0]?.content === "") || // Before subtotals
               (data.row.raw && data.row.raw[0]?.content?.startsWith("*")) || // After category headers
-              (data.row.raw && data.row.raw[0]?.content?.includes("小　　計")) // After subtotal rows
+              (data.row.raw && data.row.raw[0]?.content?.includes("計")) // After subtotal rows
             ) {
               doc.setDrawColor(0);
               doc.setLineWidth(0.1);
@@ -181,4 +201,4 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
       setIsGenerating(false);
     }
   };
-  export default generatePDF;
+  export default generateTotal;
