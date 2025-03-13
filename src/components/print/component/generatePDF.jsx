@@ -1,9 +1,16 @@
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
-const generatePDF = async ({sampleData, setIsGenerating, number}) => {
-    setIsGenerating(true);
-    console.log(number);
-    
+
+const generatePDF = async ({bb, setIsGenerating, number, name, exp, imp, creater, date}) => {
+  
+  const dateString = date;
+  const newDate = new Date(dateString);
+  const createdAt = Intl.DateTimeFormat('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(newDate);
+  setIsGenerating(true);
     try {
       const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
       
@@ -18,14 +25,14 @@ const generatePDF = async ({sampleData, setIsGenerating, number}) => {
   
       // Group rows by category
       const categories = {};
-      sampleData.forEach(row => {
+      bb.forEach(row => {
         if (row.category) {
           categories[row.category] = [];
         }
       });
       
       let currentCategory = null;
-      sampleData.forEach(row => {
+      bb.forEach(row => {
         if (row.category) {
           currentCategory = row.category;
         }
@@ -44,14 +51,17 @@ const generatePDF = async ({sampleData, setIsGenerating, number}) => {
         doc.setFontSize(16);
         doc.text("分 類 別 集 計 表 (Net)", 105, 15, { align: "center" });
         doc.setFontSize(10);
-        doc.text("見積番号：", 150, 15);
-        doc.text(`${number}`, 170, 15);
-        doc.text("仕入先：", 150, 20);
-        doc.text("株式会社", 170, 20);
-        doc.text("作成者：", 20, 25);
+        doc.text("見 積 番 号：", 150, 15);
+        doc.text(`${number}`, 180, 15);
+        doc.text("仕 入 先：", 150, 20);
+        doc.text(`${imp}`, 180, 20);
+        doc.text("提 出 先：", 150, 25);
+        doc.text(`${exp}`, 180, 25);
+        doc.text("作 成 者：", 20, 25);
+        doc.text(`${creater}`, 50, 25);
         doc.text("工 事 名：", 20, 30);
-        doc.text("空調機交換", 50, 30);
-        doc.text("2025年2月    日", doc.internal.pageSize.width - 20, 15, { align: "right" });
+        doc.text(`${name}`, 50, 30);
+        doc.text(`${createdAt}`, doc.internal.pageSize.width - 20, 15, { align: "right" });
         doc.text(`ページ ${pageIndex} / ${totalPages}`, doc.internal.pageSize.width - 20, 20, { align: "right" });
         pageIndex++;
         
