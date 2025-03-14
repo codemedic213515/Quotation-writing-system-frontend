@@ -1,12 +1,11 @@
 import { useState } from "react"
 import { Button } from "antd"
-import generatePDF from "./generatePDF"
-const Total = ({ number, net, name, imp, exp, creater, date }) => {
+import summary from "./component/summary"
+const Summary = ({ number, summ, sumimp, name, imp, exp, creater, date }) => {
   const [isGenerating, setIsGenerating] = useState(false)
-  const aa = () =>{generatePDF({net, setIsGenerating, number, name, imp, exp, creater, date})}
+  const aa = () =>{summary({summ, sumimp, setIsGenerating, number, name, imp, exp, creater, date})}
   return (
     <div>
-        <div>Total</div>
         <Button onClick={aa} disabled={isGenerating}>
           {isGenerating ? "PDFを生成中..." : "PDFを生成"}
         </Button>
@@ -14,4 +13,4 @@ const Total = ({ number, net, name, imp, exp, creater, date }) => {
   )
 }
 
-export default Total
+export default Summary
