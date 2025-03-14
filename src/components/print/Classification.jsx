@@ -20,7 +20,6 @@ const Classification = ({ number, setActiveTab }) => {
       console.log(error);
     }
     }
-  
   const fetchFormattedQuotationNet = async (quotationNumber) => {
     try {
       const response = await axios.get('/api/quotationdata/net', {
