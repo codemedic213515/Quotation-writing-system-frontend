@@ -109,8 +109,6 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
   const handleEdit = (quotation) => {
     setNumber(quotation.code);
     setActiveTab('basic');
-
-    console.log('Editing quotation:', quotation);
   };
 
   const columns = [

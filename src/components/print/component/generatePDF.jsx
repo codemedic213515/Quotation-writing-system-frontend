@@ -174,8 +174,13 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl, "_blank");
-      doc.save(`Quotation_${number}.pdf`);
-    } catch (error) {
+      if(title="分 類 別 集 計 表 (見積)"){
+      doc.save(`R051_内訳明細集計表(見積側)_${number}.pdf`);
+      }else if(title="分 類 別 集 計 表 (Net)"){
+        doc.save(`R051_内訳明細集計表(Net側)_${number}.pdf`);
+      }
+       
+  } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {
       setIsGenerating(false);

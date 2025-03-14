@@ -100,7 +100,6 @@ const StepInput = ({ setActiveTab, number }) => {
   const sendData = async () => {
     try {
       const transformedData = transformData(); // Assume this returns an array of QuotationType
-      console.log('Transformed data:', transformedData);
 
       let allSuccessful = true; // Flag to track if all requests were successful
 

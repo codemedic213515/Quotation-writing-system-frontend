@@ -63,8 +63,6 @@ export function MaterialInput({ setActiveTab, number }) {
         ABMethod: materialMethod === 'A材も含む' ? true : false, // Convert 'A材も含む' to true, else false
       };
 
-      console.log(updatedData);
-
       await Promise.all(
         updatedData.map(async (item) => {
           await axios.put(`/api/quotationtype/${item.id}`, {

@@ -54,11 +54,7 @@ const StepInput = ({ setActiveTab, number }) => {
       try {
         const response = await axios.get(`api/quotationtype?number=${number}`);
         const data = response.data;
-        console.log(data);
-
         const result = initialFormData(data);
-        console.log('result:', result);
-
         form.setFieldsValue(result);
       } catch (error) {
         console.error('error:', error);
@@ -156,9 +152,6 @@ const StepInput = ({ setActiveTab, number }) => {
         Number: number,
         CleanedData: cleanedData,
       };
-
-      console.log('Data to be sent:', requestData);
-
       const response = await axios.post('/api/quotationtype/save', requestData);
 
       if (response.status === 200) {

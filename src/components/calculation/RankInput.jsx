@@ -16,7 +16,6 @@ export function RankInput({ setActiveTab, number }) {
         return { key: id, ...rest }; // Add `key` and rest of the properties
       });
       setData(updatedData);
-      console.log(response.data);
     } catch (error) {
       console.error('Error fetching rank data:', error);
     }
@@ -35,7 +34,6 @@ export function RankInput({ setActiveTab, number }) {
   const sendData = async () => {
     try {
       const selected = data.find((item) => item.key === selectedRowKey);
-      console.log(selected);
       const { key, name, siteMiscell, otherExpens, ...rest } = selected;
       const convertedData = {
         number: number,
@@ -45,7 +43,6 @@ export function RankInput({ setActiveTab, number }) {
         ...rest,
       };
       const response = await axios.post('/api/quotationcalc', convertedData);
-      console.log('Data sent for quotation calculation:', response);
       setActiveTab('price');
     } catch (error) {
       console.error('Error sending data for quotation calculation:', error);
@@ -66,7 +63,6 @@ export function RankInput({ setActiveTab, number }) {
   // Handle Row Selection
   const handleRowSelect = (record) => {
     setSelectedRowKey(record.key);
-    console.log('Selected Row:', record);
   };
 
   // Update Rank Master Data in Backend
@@ -87,7 +83,6 @@ export function RankInput({ setActiveTab, number }) {
     if (selectedRowKey) {
       const updatedRow = data.find((item) => item.key === selectedRowKey);
       updateRankPost(updatedRow); // Update rank master datas
-      console.log('Updated row:', updatedRow);
     } else {
       console.log('No row selected for update.');
     }

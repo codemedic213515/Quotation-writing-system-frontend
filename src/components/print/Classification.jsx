@@ -25,7 +25,6 @@ const Classification = ({ number, setActiveTab }) => {
       const response = await axios.get('/api/quotationdata/net', {
         params: { quotationNumber },
       });
-      console.log("Formatted Quotation Data:", response.data);
       setNet(response.data)
   
       return response.data;
@@ -39,7 +38,6 @@ const Classification = ({ number, setActiveTab }) => {
       const response = await axios.get('/api/quotationdata/formatted', {
         params: { quotationNumber },
       });
-      console.log("Formatted Quotation Data:", response.data);
       setQuotate(response.data)
   
       return response.data;
@@ -54,12 +52,13 @@ useEffect(()=>{
   fetchFormattedQuotationQuotate(number)
 },[number])  
   return (
-    <div>
+    <div className="w-full h-[60vh] overflow-auto">
+    <div className="flex flex-col gap-10  mt-12 justify-middle">
       <Net net={net} number={number} name={quotationMain.name} creater={quotationMain.creater} exp={quotationMain.export} imp={quotationMain.import} date={quotationMain.createdAt}/>
       <Quotate net={quotate} number={number} name={quotationMain.name} creater={quotationMain.creater} exp={quotationMain.export} imp={quotationMain.import} date={quotationMain.createdAt}/>
       <Total net={quotate} number={number} name={quotationMain.name} creater={quotationMain.creater} exp={quotationMain.export} imp={quotationMain.import} date={quotationMain.createdAt}/>
     </div>
-  )
+    </div>)
 }
 
 export default Classification

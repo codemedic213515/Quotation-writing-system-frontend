@@ -112,9 +112,9 @@ const SummaryTable=({ number, setActiveTab }) =>{
 
     return [...rows, totalA, totalB, ratioRow, profitRow];
   };
-console.log("main : ", quotationMain);
 
   return (
+    <div className="w-full h-[60vh] overflow-auto">
     <div>
        <div>
         <Summary summ={summary} sumimp={sumimp} number={number} name={quotationMain.name} creater={quotationMain.creater} exp={quotationMain.export} imp={quotationMain.import} date={quotationMain.createdAt}/>
@@ -147,7 +147,7 @@ console.log("main : ", quotationMain);
         </table>
       )}
     </div>
- 
+ </div>
     </div>
   )
 }
