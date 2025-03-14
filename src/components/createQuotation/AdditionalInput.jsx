@@ -23,7 +23,6 @@ const AdditionalInput = ({ setActiveTab, number }) => {
       message.success('Add datas to Quotation!');
       setActiveTab('step');
     } else {
-      console.log(response);
       message.error('error');
     }
   };

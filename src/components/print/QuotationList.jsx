@@ -1,48 +1,11 @@
-// import { useState, useEffect } from "react";
-// import axios from "axios";
-
-// const QuotationList=({ number, setActiveTab }) =>{
-//   const[endDate, setEndData]=useState([])
-//   const [quotationMain, setQuotationMain] = useState([]);
-//   const [tableData, setTableData] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   if (number == '') {
-//     setActiveTab('select');
-//   }
-// useEffect(()=>{
-//   fetchData(number);
-// },[number])
-
-//  const fetchData = async(quotationNumber)=>{
-//   setLoading(true)
-//   try{
-//     const [quotationRes, endRes] = await Promise.all([
-//       axios.get(`/api/quotationmain`, { params: { code: quotationNumber } }),
-//       axios.get(`/api/quotationdata/end/${quotationNumber}`),
-      
-//     ]);
-//     setQuotationMain(quotationRes.data.data[0] );
-//     setEndData(endRes.data);
-//   }catch (error) {
-//     console.error("Error fetching data:", error);
-//   }
-//  }
-
-//  console.log(endDate);
- 
-//   return <>見積一覧表</>;
-// }
-// export default QuotationList;
-
-
-
 import { useState, useEffect } from "react";
 import axios from "axios";
+import List from"./List"
 
 const QuotationList = ({ number, setActiveTab }) => {
   const [endData, setEndData] = useState([]);
-  const [quotationMain, setQuotationMain] = useState(null);
   const [error, setError] = useState(null);
+  const [quotationMain, setQuotationMain] = useState([]);
 
   useEffect(() => {
     if (!number) {
@@ -70,18 +33,17 @@ const QuotationList = ({ number, setActiveTab }) => {
   const transformData = (data) => {
     if (!data) return [];
 
-    let totalPrice1 = 0;
-    let totalPrice2 = 0;
-    let categoryTotals = { ABCode1: 0, ABCode2: 0, Others: 0 };
+    let totalPrice1 = 0, totalPrice2 = 0;
+    let categoryTotals = { ABCode1: { Price1: 0, Price2: 0 }, ABCode2: { Price1: 0, Price2: 0 }, Others: { Price1: 0, Price2: 0 } };
     let groupedMaterials = { ABCode1: {}, ABCode2: {}, Others: {} };
 
-    // ** Step 1: Group by ID (Summing Price1 & Price2) **
+    // ** Step 1: Group and Sum Prices per ID **
     Object.entries(data).forEach(([categoryKey, materials]) => {
       materials.forEach((item) => {
-        const id = item.id;
+        const id = item.id.toString();
         if (!groupedMaterials[categoryKey][id]) {
           groupedMaterials[categoryKey][id] = {
-            No: id || "-",
+            No: id,
             Category: item.category || "-",
             Price1: 0,
             Price2: 0,
@@ -93,7 +55,8 @@ const QuotationList = ({ number, setActiveTab }) => {
         }
         groupedMaterials[categoryKey][id].Price1 += item.priceCost || 0;
         groupedMaterials[categoryKey][id].Price2 += item.internalCost || 0;
-        categoryTotals[categoryKey] += item.priceCost || 0;
+        categoryTotals[categoryKey].Price1 += item.priceCost || 0;
+        categoryTotals[categoryKey].Price2 += item.internalCost || 0;
         totalPrice1 += item.priceCost || 0;
         totalPrice2 += item.internalCost || 0;
       });
@@ -117,18 +80,26 @@ const QuotationList = ({ number, setActiveTab }) => {
 
     Object.keys(subtotalKeys).forEach((categoryKey) => {
       if (sortedRows[categoryKey].length > 0) {
+        // Calculate ratio for each item before pushing
+        sortedRows[categoryKey].forEach((item) => {
+          item.Ratio1 = totalPrice1 !== 0 ? ((item.Price1 / totalPrice1) * 100).toFixed(3) + "%" : "0.000%";
+          item.Ratio2 = totalPrice2 !== 0 ? ((item.Price2 / totalPrice2) * 100).toFixed(3) + "%" : "0.000%";
+        });
+
         finalRows.push(...sortedRows[categoryKey]); // Add sorted rows
+
+        // Add category subtotal row
         const categoryTotal = categoryTotals[categoryKey];
 
         finalRows.push({
           No: "",
           Category: subtotalKeys[categoryKey],
-          Price1: categoryTotal.toLocaleString(),
-          Ratio1: totalPrice1 !== 0 ? ((categoryTotal / totalPrice1) * 100).toFixed(2) + "%" : "0.00%",
+          Price1: categoryTotal.Price1.toLocaleString(),
+          Ratio1: totalPrice1 !== 0 ? ((categoryTotal.Price1 / totalPrice1) * 100).toFixed(3) + "%" : "0.000%",
           Work1: "0.00",
           Other1: "",
-          Price2: categoryTotal.toLocaleString(),
-          Ratio2: totalPrice2 !== 0 ? ((categoryTotal / totalPrice2) * 100).toFixed(2) + "%" : "0.00%",
+          Price2: categoryTotal.Price2.toLocaleString(),
+          Ratio2: totalPrice2 !== 0 ? ((categoryTotal.Price2 / totalPrice2) * 100).toFixed(3) + "%" : "0.000%",
           Work2: "0.00",
           Other2: ""
         });
@@ -140,11 +111,11 @@ const QuotationList = ({ number, setActiveTab }) => {
       No: "",
       Category: "【 合計 】",
       Price1: totalPrice1.toLocaleString(),
-      Ratio1: "100%",
+      Ratio1: "100.000%",
       Work1: "0.00",
       Other1: "",
       Price2: totalPrice2.toLocaleString(),
-      Ratio2: "100%",
+      Ratio2: "100.000%",
       Work2: "0.00",
       Other2: ""
     });
@@ -153,36 +124,31 @@ const QuotationList = ({ number, setActiveTab }) => {
   };
 
   return (
-    <div>
-      <h2>見積一覧表</h2>
-
+    <div className="w-full h-[60vh] overflow-auto">
+    
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {!error && (
         <>
-          <h3>Quotation Details</h3>
-          <p>見積番号: {quotationMain?.code || "N/A"}</p>
-          <p>作成者: {quotationMain?.creater || "N/A"}</p>
-          <p>工事名: {quotationMain?.name || "N/A"}</p>
-
-          <table border="1" cellPadding="5" style={{ width: "100%", borderCollapse: "collapse" }}>
+         <List number={number} endData={endData} name={quotationMain.name} creater={quotationMain.creater} exp={quotationMain.export} imp={quotationMain.import} date={quotationMain.createdAt}/>
+          <table border="1" cellPadding="5" style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
             <thead>
               <tr>
-                <th>No</th>
-                <th>Category</th>
-                <th>Price1</th>
-                <th>Ratio1</th>
-                <th>Work1</th>
-                <th>Other1</th>
-                <th>Price2</th>
-                <th>Ratio2</th>
-                <th>Work2</th>
-                <th>Other2</th>
+                <th>【 N o . 】</th>
+                <th>【 分 類 名 称 】</th>
+                <th>【 提 出 金 額 】</th>
+                <th>【 構 成 比 】</th>
+                <th>【 工 数 】</th>
+                <th>【 備 考 】</th>
+                <th>【 提 出 金 額 】</th>
+                <th>【 構 成 比 】</th>
+                <th>【 工 数 】</th>
+                <th>【 備 考 】</th>
               </tr>
             </thead>
             <tbody>
               {endData.map((row, index) => (
-                <tr key={index} style={{ fontWeight: row.No === "" ? "bold" : "normal", backgroundColor: row.No === "" ? "#f2f2f2" : "white" }}>
+                <tr key={index} style={{ fontWeight: row.No === "" ? "bold" : "normal", backgroundColor: row.No === "" ? "#f2f2f2" : "white", textAlign: "center" }}>
                   <td>{row.No}</td>
                   <td>{row.Category}</td>
                   <td>{row.Price1}</td>

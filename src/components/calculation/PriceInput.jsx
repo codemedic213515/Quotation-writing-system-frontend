@@ -72,7 +72,6 @@ export function PriceInput({ setActiveTab, number }) {
             });
           }),
         );
-        console.log('Data updated successfully');
       } else {
         console.log('No rows have been updated.');
       }

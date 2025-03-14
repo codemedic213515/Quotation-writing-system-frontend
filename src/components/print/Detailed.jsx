@@ -93,7 +93,6 @@ const Detailed = ({ number, setActiveTab }) => {
       const response = await axios.get('/api/quotationtype', {
         params: { number: number },
       });
-      console.log("Types : ", response.data);
       return response.data;
       
     } catch (error) {
@@ -107,7 +106,6 @@ const Detailed = ({ number, setActiveTab }) => {
       const response = await axios.get('/api/quotationprice/type', {
         params: { quotationNumber: number },
       });
-      console.log("Prices : ", response.data);
       
       return response.data;
     } catch (error) {
@@ -538,7 +536,6 @@ const Detailed = ({ number, setActiveTab }) => {
   useEffect(()=>{
     setDetailedData(formatQuotationData( prices))
   },[ prices])
-  console.log(tableData);
 
   const generatePDF = async () => {
     if (!Array.isArray(tableData) || tableData.length === 0) {
@@ -650,7 +647,7 @@ const Detailed = ({ number, setActiveTab }) => {
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, '_blank');
-    doc.save(`Quotation_${number}.pdf`);
+    doc.save(`R051_工種別内訳表(PDF)_${number}.pdf`);
   };
 
    const generateDetail = async () => {
@@ -763,8 +760,7 @@ const Detailed = ({ number, setActiveTab }) => {
     const pdfBlob = doc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, '_blank');
-    doc.save(`Detailed
-      -${number}.pdf`);
+    doc.save(`DR051_内訳明細書(PDF)_${number}.pdf`);
    };
   return (
     <div className="w-full p-6 bg-white ">

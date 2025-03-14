@@ -194,7 +194,6 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
     const category2Id = current[fieldKey]?.category2.split('*')[1];
 
     fetchMaterials(category1Id, category2Id, value.split('*')[1], fieldKey, cardId);
-    console.log(current);
   };
 
   useEffect(() => {
@@ -231,7 +230,6 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
     try {
       const formValues = form.getFieldsValue(); // Raw data from the form
       const transformedData = transformData(formValues);
-      console.log('Transformed Data:', transformedData);
       const response = await axios.post(
         '/api/quotationmaterial',
         transformedData,

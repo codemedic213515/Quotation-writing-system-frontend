@@ -27,14 +27,12 @@ export function SetInput({ setActiveTab, number }) {
     const fetchData = async () => {
       try {
         const response = await axios.get(`/api/quotationcalc/${number}`);
-        console.log('Fetched Data:', response.data); // Add this log to check what data looks like
         if (Array.isArray(response.data)) {
           const transformedData = transformData(response.data);
           const updatedData = decodeData(transformedData);
           setData(updatedData);
         } else {
           // Handle case where data is not an array
-          console.error('Expected an array but received:', response.data);
           setData([
             {
               key: '1',
@@ -124,7 +122,6 @@ export function SetInput({ setActiveTab, number }) {
     const quotationCalc = result;
     try {
       const response = await axios.post(`/api/quotationcalc`, quotationCalc);
-      console.log(response);
     } catch (error) {
       console.log(error);
     }
@@ -133,7 +130,6 @@ export function SetInput({ setActiveTab, number }) {
   const sendData = () => {
     const result = transformData(data);
     result.number = number;
-    console.log(result);
     send(result);
     setActiveTab('rank');
   };

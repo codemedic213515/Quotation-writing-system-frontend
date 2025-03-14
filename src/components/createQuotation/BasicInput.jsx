@@ -112,9 +112,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
     if (response.status === 200) {
       setActiveTab('addition');
       message.success('Create Quotation Success!');
-      console.log(response);
     } else {
-      console.log(response);
       message.error('Failed create Quotation');
     }
   };

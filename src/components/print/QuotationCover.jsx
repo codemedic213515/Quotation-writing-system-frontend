@@ -110,7 +110,6 @@ const QuotationCover = ({ number, setActiveTab }) => {
           code: number,
         },
       });
-      console.log('response: ', response.data.data);
       setQuotation(response.data.data[0]);
     } catch (error) {
       console.log(error);
@@ -141,7 +140,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
         })
-        .save(`${number}.pdf`)
+        .save(`R051_見積書表紙(PDF)_${number}.pdf`)
         .outputPdf('blob') // ✅ Output as blob
         .then((pdfBlob) => {
           const blobUrl = URL.createObjectURL(pdfBlob);

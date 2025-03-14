@@ -32,8 +32,6 @@ export function Rank() {
       )
     );
   };
-console.log(data);
-
   const saveChanges = async (record) => {
     try {
       await axios.put(`/api/rank/${record.Id}`, record);

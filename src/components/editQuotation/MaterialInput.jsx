@@ -41,7 +41,6 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
     try {
       const response = await axios.get(`api/quotationtype?number=${number}`)
       setQuotationData(response.data)
-console.log(response.data);
 
       // After fetching quotation types, fetch materials for each type
       response.data.forEach((type) => {
@@ -214,7 +213,6 @@ console.log(response.data);
     const category2Id = current[fieldKey]?.category2.split("*")[1]
 
     fetchMaterials(category1Id, category2Id, value.split("*")[1], fieldKey, cardId)
-    console.log(current)
   }
 
   // Edit existing material
@@ -325,8 +323,6 @@ console.log(response.data);
     try {
       const formValues = form.getFieldsValue() // Raw data from the form
       const transformedData = transformData(formValues) // Transform data into required format
-
-      console.log("Transformed Data:", transformedData)
 
       const response = await axios.post("/api/quotationmaterial", transformedData)
       if (response.status !== 200) {

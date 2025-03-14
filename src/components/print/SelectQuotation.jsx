@@ -73,7 +73,6 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
   const handleEdit = (quotation) => {
     setActiveTab('cover');
     setNumber(quotation.code);
-    console.log('Editing quotation:', quotation);
   };
 
   const columns = [

@@ -27,11 +27,11 @@ const summary = async ({ summ, sumimp, setIsGenerating, number, name, exp, imp, 
       doc.setFontSize(18);
       doc.text("総 括 表", 15, 15);
       doc.setFontSize(10);
-      doc.text(`見積番号： ${number || "N/A"}`, 150, 15);
-      doc.text(`提出先： ${exp || "N/A"}`, 150, 20);
-      doc.text(`作成者： ${creater || "N/A"}`, 20, 20);
-      doc.text(`仕入先： ${imp || "N/A"}`, 150, 25);
-      doc.text(`工事名： ${name || "N/A"}`, 20, 25);
+      doc.text(`見積番号： ${number }`, 150, 15);
+      doc.text(`提出先： ${exp }`, 150, 20);
+      doc.text(`作成者： ${creater }`, 20, 20);
+      doc.text(`仕入先： ${imp }`, 150, 25);
+      doc.text(`工事名： ${name }`, 20, 25);
       doc.text(`${createdAt}`, doc.internal.pageSize.width - 20, 15, { align: "right" });
     };
 
@@ -161,7 +161,7 @@ const summary = async ({ summ, sumimp, setIsGenerating, number, name, exp, imp, 
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl, "_blank");
-    doc.save(`Quotation_${number}.pdf`);
+    doc.save(`R051_総括表(全出力)_${number}.pdf`);
   } catch (error) {
     console.error("Error generating PDF:", error);
   } finally {

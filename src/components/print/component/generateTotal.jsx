@@ -194,7 +194,7 @@ const generateTotal = async ({net, setIsGenerating, number, name, exp, imp, crea
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl, "_blank");
-      doc.save(`Quotation_${number}.pdf`);
+      doc.save(`R051_内訳明細集計表(全出力)_${number}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
     } finally {
