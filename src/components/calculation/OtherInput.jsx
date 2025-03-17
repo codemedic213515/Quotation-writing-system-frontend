@@ -48,12 +48,12 @@ export function OtherInput({ setActiveTab, number }) {
       .put(`/api/calculationdata/${number}`, formData)
       .then(() => {
         notification.success({
-          message: 'Data updated successfully',
+          message: 'データが正常に更新されました',
         });
       })
       .catch((error) => {
         notification.error({
-          message: 'Error updating data',
+          message: 'データの更新中にエラーが発生しました',
           description: error.response?.data?.message || 'Something went wrong',
         });
       });

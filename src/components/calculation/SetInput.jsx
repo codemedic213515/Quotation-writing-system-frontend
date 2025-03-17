@@ -122,6 +122,8 @@ export function SetInput({ setActiveTab, number }) {
     const quotationCalc = result;
     try {
       const response = await axios.post(`/api/quotationcalc`, quotationCalc);
+      console.log(response);
+      
     } catch (error) {
       console.log(error);
     }

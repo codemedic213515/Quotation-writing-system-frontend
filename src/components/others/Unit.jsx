@@ -23,7 +23,7 @@ export function UnitData() {
       setData(response.data.items);
       setTotal(response.data.total);
     } catch (error) {
-      message.error('Failed to load unit master data');
+      message.error('ユニットマスターデータの読み込みに失敗しました');
     }
     setLoading(false);
   };
@@ -31,11 +31,11 @@ export function UnitData() {
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/unit/${selectedRow.id}`);
-      message.success('Unit deleted successfully');
+      message.success('ユニットが正常に削除されました');
       setIsDeleteModalVisible(false);
       fetchUnitData();
     } catch (error) {
-      message.error('Failed to delete unit');
+      message.error('ユニットの削除に失敗しました');
     }
   };
 
@@ -43,13 +43,13 @@ export function UnitData() {
     try {
       const response = await axios.post('/api/unit', newUnit);
       if (response.status === 201) {
-        message.success('Unit added successfully');
+        message.success('ユニットの追加が成功しました');
         setIsAddModalVisible(false);
         fetchUnitData();
         setNewUnit({ Name: '' });
       }
     } catch (error) {
-      message.error('Failed to add unit');
+      message.error('ユニットの追加に失敗しました');
     }
   };
 
@@ -114,13 +114,13 @@ export function UnitData() {
         onChange={handleTableChange}
       />
       <Modal
-        title="Add New Unit"
+        title="単位を追加"
         open={isAddModalVisible}
         onCancel={() => setIsAddModalVisible(false)}
         onOk={handleAddNew}
       >
         <Form layout="vertical">
-          <Form.Item label="Unit Name">
+          <Form.Item label="単位名">
             <Input
               value={newUnit.Name}
               onChange={(e) => setNewUnit({ ...newUnit, Name: e.target.value })}
@@ -129,12 +129,12 @@ export function UnitData() {
         </Form>
       </Modal>
       <Modal
-        title="Confirm Delete"
+        title="削除"
         open={isDeleteModalVisible}
         onCancel={() => setIsDeleteModalVisible(false)}
         onOk={handleDelete}
       >
-        <p>Are you sure you want to delete this unit?</p>
+        <p>この単位を削除してもよろしいですか?</p>
       </Modal>
     </div>
   );

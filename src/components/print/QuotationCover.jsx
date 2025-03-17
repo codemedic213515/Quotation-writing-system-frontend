@@ -5,15 +5,12 @@ import {
   Divider,
   Image,
   Input,
-  Modal,
   InputNumber,
   Radio,
   Select,
   Typography,
-  Button,
 } from 'antd';
 import axios from 'axios';
-import html2pdf from 'html2pdf.js';
 import CoverPDF from './component/CoverPDF';
 
 const { Title, Text } = Typography;
@@ -33,7 +30,6 @@ const QuotationCover = ({ number, setActiveTab }) => {
   const [method, setMethod] = useState('従来通り');
   const [des, setDes] = useState();
   const [totalPrice, setTotalPrice] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
   if (number == '') {
     setActiveTab('select');
   }
@@ -127,28 +123,7 @@ const QuotationCover = ({ number, setActiveTab }) => {
     other: other,
     des: des,
   };
-  const pdfRef = useRef();
-  const generatePDF = () => {
-    const element = pdfRef.current;
-    if (element) {
-      html2pdf()
-        .from(element)
-        .set({
-          margin: 20,
-          filename: `${number}.pdf`,
-          image: { type: 'png', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-        })
-        .save(`R051_見積書表紙(PDF)_${number}.pdf`)
-        .outputPdf('blob') // ✅ Output as blob
-        .then((pdfBlob) => {
-          const blobUrl = URL.createObjectURL(pdfBlob);
-          window.open(blobUrl, '_blank'); // ✅ Open in a new tab
-        });
-    }
-    closeModal();
-  };
+
   return (
     <div className="w-full h-[60vh] overflow-auto">
       <div className="flex flex-row gap-8 p-6 pt-0 justify-center">
@@ -340,38 +315,9 @@ const QuotationCover = ({ number, setActiveTab }) => {
           >
             金抜き
           </Checkbox>
-          <Button
-            onClick={() => {
-              openModal();
-            }}
-          >
-            Print PDF
-          </Button>
+         <CoverPDF data={data}/>
         </div>
-        <Modal
-          title="見積プレビュー"
-          open={modalVisible}
-          onCancel={closeModal}
-          footer={[
-            <Button key="close" onClick={closeModal}>
-              Close
-            </Button>,
-            <Button
-              key="download"
-              shape="square"
-              type="primary"
-              className="bg-blue-600"
-              onClick={generatePDF}
-            >
-              Download PDF
-            </Button>
-          ]}
-          width={900}
-        >
-          <div ref={pdfRef}>
-            <CoverPDF data={data}/>
-          </div>
-        </Modal>
+
       </div>
     </div>
   );

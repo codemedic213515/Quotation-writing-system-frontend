@@ -111,11 +111,11 @@ const QuotationList = ({ number, setActiveTab }) => {
       No: "",
       Category: "【 合計 】",
       Price1: totalPrice1.toLocaleString(),
-      Ratio1: "100.000%",
+      Ratio1: "100.00%",
       Work1: "0.00",
       Other1: "",
       Price2: totalPrice2.toLocaleString(),
-      Ratio2: "100.000%",
+      Ratio2: "100.00%",
       Work2: "0.00",
       Other2: ""
     });
