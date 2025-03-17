@@ -20,10 +20,10 @@ const AdditionalInput = ({ setActiveTab, number }) => {
 
     const response = await axios.put(`/api/quotationmain/${code}`, data);
     if (response.status === 200) {
-      message.success('Add datas to Quotation!');
+      message.success('見積書にデータを追加する');
       setActiveTab('step');
     } else {
-      message.error('error');
+      message.error('見積にデータを追加するときのエラー');
     }
   };
   return (

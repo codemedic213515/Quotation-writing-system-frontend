@@ -93,9 +93,9 @@ useEffect(()=>{
     <div className="p-6 mx-auto max-w-7xl w-full h-[60vh] text-center overflow-auto font-bold">
       <Form>
         <div className="flex flex-row gap-4 mb-5 justify-center">
-          <Select showSearch allowClear popupMatchSelectWidth={false} placeholder="Category1" className="w-1/4" options={category1} onChange={fetchCategory2Data} />
-          <Select showSearch allowClear popupMatchSelectWidth={false} placeholder="Category2" className="w-1/4" options={category2} onChange={fetchCategory3Data} disabled={!selectedCategory1} />
-          <Select showSearch allowClear  popupMatchSelectWidth={false}placeholder="Category3" className="w-1/4" options={category3} onChange={(value) => { setSelectedCategory3(value);     setFilters((prev) => ({ ...prev, category3:value }));}} disabled={!selectedCategory2} />
+          <Select showSearch allowClear popupMatchSelectWidth={false} placeholder="" className="w-1/4" options={category1} onChange={fetchCategory2Data} />
+          <Select showSearch allowClear popupMatchSelectWidth={false} placeholder="" className="w-1/4" options={category2} onChange={fetchCategory3Data} disabled={!selectedCategory1} />
+          <Select showSearch allowClear  popupMatchSelectWidth={false}placeholder="" className="w-1/4" options={category3} onChange={(value) => { setSelectedCategory3(value);     setFilters((prev) => ({ ...prev, category3:value }));}} disabled={!selectedCategory2} />
         </div>
         <Table
           columns={columns}

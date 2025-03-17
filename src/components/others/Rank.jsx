@@ -20,7 +20,7 @@ export function Rank() {
       setData(response.data.items);
       setTotal(response.data.total);
     } catch (error) {
-      message.error('Failed to load rank master data');
+      message.error('ランクマスターデータの読み込みに失敗しました');
     }
     setLoading(false);
   };
@@ -35,11 +35,11 @@ export function Rank() {
   const saveChanges = async (record) => {
     try {
       await axios.put(`/api/rank/${record.Id}`, record);
-      message.success('Updated successfully');
+      message.success('更新に成功しました');
       setEditingKey(null);
       fetchRankMasters();
     } catch (error) {
-      message.error('Update failed');
+      message.error('更新に失敗しました');
     }
   };
 

@@ -10,7 +10,6 @@ import { PuzzlePieceIcon, ServerIcon } from '@heroicons/react/24/solid';
 import MaterialCategory from '@/components/material/MaterialCateogry';
 import MaterialMaster from '@/components/material/MaterialMaster';
 
-import { Link } from 'react-router-dom';
 export function Material() {
   const [activeTab, setActiveTab] = useState('category');
   return (

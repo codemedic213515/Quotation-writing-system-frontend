@@ -4,7 +4,6 @@ import {
   Select,
   DatePicker,
   Table,
-  Pagination,
   message,
   Button,
 } from 'antd';
@@ -32,7 +31,7 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
-      message.error('Failed to fetch users');
+      message.error('ユーザーの取得に失敗しました');
     }
   };
 
@@ -56,7 +55,7 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
       setTotalRecords(response.data.totalRecords);
     } catch (error) {
       console.error('Error fetching quotations:', error);
-      message.error('Failed to fetch quotations');
+      message.error('引用を取得できませんでした');
     } finally {
       setLoading(false);
     }
@@ -83,6 +82,7 @@ export function SelectQuotation({ setActiveTab, setNumber }) {
   const handleEdit = (quotation) => {
     setActiveTab('set');
     setNumber(quotation.code);
+    console.log('Editing quotation:', quotation);
   };
 
   const columns = [

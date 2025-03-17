@@ -16,7 +16,7 @@ import moment from 'moment';
 
 const { TextArea } = Input;
 
-const BasicInput = ({ setActiveTab, number, setNumber }) => {
+const BasicInput = ({ setActiveTab, setNumber }) => {
   // Existing state
   const [option, setOption] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
   const [quotationAddress, setQuotationAddress] = useState('');
   const [selectedMainPrefecture, setSelectedMainPrefecture] = useState('');
   const [selectedMainCity, setSelectedMainCity] = useState('');
-  const [selectedMain, setSelectedMain] = useState(null);
   const [rowCount, setRowCount] = useState('');
   const [selectedExportRadio, setSelectedExportRadio] = useState('');
   const [selectedMainExportName, setSelectedMainExportName] = useState('');
@@ -39,8 +38,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [mainImport, setMainImport] = useState('');
   const [exportName, setExportName] = useState('');
-  // New state for customer data processing
-  const [customerOption, setCustomerOption] = useState(null); // Selected option for postal code
+  const [customerOption, setCustomerOption] = useState(null); 
   const [customerName, setCustomerName] = useState('');
   const [branchName, setBranchName] = useState('');
   const [customerAddressValue, setCustomerAddressValue] = useState('0');
@@ -111,9 +109,9 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
     const response = await axios.post('/api/quotationmain', data);
     if (response.status === 200) {
       setActiveTab('addition');
-      message.success('Create Quotation Success!');
+      message.success('見積書の作成が成功しました');
     } else {
-      message.error('Failed create Quotation');
+      message.error('見積書の作成に失敗しました');
     }
   };
 
@@ -129,7 +127,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       setPrefectures(filteredPrefectures);
     } catch (error) {
       console.error('Error fetching prefectures:', error);
-      message.error('Failed to fetch prefectures');
+      message.error('県の取得に失敗しました');
     }
   };
 
@@ -143,7 +141,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       setCities(filteredCities);
     } catch (error) {
       console.error('Error fetching cities:', error);
-      message.error('Failed to fetch cities');
+      message.error('都市の取得に失敗しました');
     }
   };
 
@@ -201,7 +199,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       setCustomerData(response.data);
     } catch (error) {
       console.error('Error fetching customer data:', error);
-      message.error('Failed to fetch customer data');
+      message.error('顧客データの取得に失敗しました');
     }
   };
 
@@ -232,7 +230,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       setCities(filteredCities);
     } catch (error) {
       console.error('Error fetching cities:', error);
-      message.error('Failed to fetch cities');
+      message.error('都市の取得に失敗しました');
     }
   };
 
@@ -283,7 +281,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
 
       const response = await axios.post('/api/customer', customerData);
       if (response.status === 200) {
-        message.success('Customer created successfully');
+        message.success('顧客が正常に作成されました');
         setCustomerName('');
         setBranchName('');
         setCustomerAddressValue('0');
@@ -302,7 +300,7 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
       }
     } catch (error) {
       console.error('Error creating customer:', error);
-      message.error('Failed to create customer');
+      message.error('顧客を作成できませんでした');
     }
   };
 
@@ -390,7 +388,6 @@ const BasicInput = ({ setActiveTab, number, setNumber }) => {
                       value={option.label}
                       disabled={selectedMainAddressValue !== '3'}
                       onSearch={(value) => {
-                        /* Wait for the user to press Enter */
                       }}
                       onInputKeyDown={(e) => {
                         if (e.key === 'Enter') {

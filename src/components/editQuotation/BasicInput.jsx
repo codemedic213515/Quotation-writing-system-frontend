@@ -15,7 +15,6 @@ const BasicInput = ({ setActiveTab, number }) => {
   const [quotationAddress, setQuotationAddress] = useState('');
   const [selectedMainPrefecture, setSelectedMainPrefecture] = useState('');
   const [selectedMainCity, setSelectedMainCity] = useState('');
-  const [selectedMain, setSelectedMain] = useState(null);
   const [subName, setSubName] = useState('');
   const [selectedExportRadio, setSelectedExportRadio] = useState('');
   const [selectedMainExportName, setSelectedMainExportName] = useState('');
@@ -25,7 +24,7 @@ const BasicInput = ({ setActiveTab, number }) => {
   const [exportName, setExportName] = useState('');
 
   if (number === '') {
-    message.info('Plz select the Quotation');
+    message.info('見積書を選択してください');
     setActiveTab('select');
   }
 
@@ -64,7 +63,7 @@ const BasicInput = ({ setActiveTab, number }) => {
         setPrefectures(filteredPrefectures);
       } catch (error) {
         console.error('Error fetching prefectures:', error);
-        message.error('Failed to fetch prefectures');
+        message.error('都道府県の取得に失敗しました');
       }
     };
     if (number) {
@@ -120,9 +119,9 @@ const BasicInput = ({ setActiveTab, number }) => {
     const response = await axios.put(`/api/quotationmain/${number}`, data);
     if (response.status === 200) {
       setActiveTab('addition');
-      message.success('Create Quotation Success!');
+      message.success('見積もりの作成が成功しました');
     } else {
-      message.error('Failed create Quotation');
+      message.error('見積書の作成に失敗しました');
     }
   };
 
@@ -136,7 +135,7 @@ const BasicInput = ({ setActiveTab, number }) => {
       setCities(filteredCities);
     } catch (error) {
       console.error('Error fetching cities:', error);
-      message.error('Failed to fetch cities');
+      message.error('都市の取得に失敗しました');
     }
   };
 

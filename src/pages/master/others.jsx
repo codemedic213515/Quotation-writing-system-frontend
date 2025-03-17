@@ -10,7 +10,6 @@ import { BarsArrowDownIcon, AtSymbolIcon } from '@heroicons/react/24/solid';
 import Rank from '@/components/others/Rank';
 import Unit from '@/components/others/Unit';
 
-import { Link } from 'react-router-dom';
 export function Others() {
   const [activeTab, setActiveTab] = useState('rank');
   return (

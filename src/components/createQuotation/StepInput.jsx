@@ -18,7 +18,6 @@ const StepInput = ({ setActiveTab, number }) => {
   if (number == '') {
     setActiveTab('basic');
   }
-  // Fetch construction data from API
   const fetchConstruction = async () => {
     try {
       const response = await axios.get('/api/construction');
@@ -32,7 +31,7 @@ const StepInput = ({ setActiveTab, number }) => {
       setOptions(option);
     } catch (error) {
       console.error('Error fetching constructions:', error);
-      message.error('Failed to fetch construction data');
+      message.error('建設データの取得に失敗しました');
     }
   };
 
@@ -81,7 +80,6 @@ const StepInput = ({ setActiveTab, number }) => {
         });
       });
 
-      // Handle case where there are no children
       if (item.children.length === 0) {
         result.push({
           Number: code || '',
@@ -104,7 +102,6 @@ const StepInput = ({ setActiveTab, number }) => {
       let allSuccessful = true; // Flag to track if all requests were successful
 
       for (let i = 0; i < transformedData.length; i++) {
-        // Prepare the data in the expected format
         const dataToSend = {
           Number: transformedData[i].Number || '',
           Category1: transformedData[i].Category1 || '',
@@ -123,25 +120,25 @@ const StepInput = ({ setActiveTab, number }) => {
             console.log(`Create Type Success for item ${i + 1}`);
           } else {
             console.error(`Create type failed for item ${i + 1}`);
-            message.error(`Create type failed for item ${i + 1}`);
+            message.error(`項目のタイプの作成に失敗しました ${i + 1}`);
             allSuccessful = false; // Set flag to false if any request fails
           }
         } catch (error) {
           console.error(`Error creating type for item ${i + 1}:`, error);
-          message.error(`Create type failed for item ${i + 1}`);
+          message.error(`項目のタイプの作成に失敗しました ${i + 1}`);
           allSuccessful = false;
         }
       }
 
       // Show appropriate message based on request status
       if (allSuccessful) {
-        message.success('All types created successfully!');
+        message.success('すべての型が正常に作成されました');
         setActiveTab('material'); // Move to the next tab if successful
       } else {
-        message.warning('Some types failed to create.');
+        message.warning('一部のタイプの作成に失敗しました');
       }
     } catch (error) {
-      message.error('Create type process failed!');
+      message.error('タイプ作成プロセスに失敗しました');
       console.error('Error:', error);
     }
   };

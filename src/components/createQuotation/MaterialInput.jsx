@@ -19,10 +19,8 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
   const [category1Option, setCategory1Option] = useState([]);
   const [category2Option, setCategory2Option] = useState({});
   const [category3Option, setCategory3Option] = useState({});
-  // const [category4Option, setCategory4Option] = useState({});
   const [unitOption, setUnitOption] = useState([]);
   const [categoryOption, setCategoryOption] = useState([]);
-  // Fetch quotationTypes based on number
   if (number == '') {
     setActiveTab('basic');
   }
@@ -237,11 +235,11 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
       if (response.status !== 200) {
         throw new Error(`Failed to save data for typeId: ${data.typeId}`);
       }
-      message.success('All data saved successfully!');
+      message.success('すべてのデータは無事に保存されました');
       setNumber('');
     } catch (error) {
       console.error('Error saving data:', error);
-      message.error('Error saving data');
+      message.error('データの保存中にエラーが発生しました');
     }
   };
 
@@ -277,7 +275,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         <Form.Item
                           name={[field.name, 'category1']}
                           rules={[
-                            { required: true, message: 'Select category 1' },
+                            { required: true, message: 'カテゴリー1を選択してください' },
                           ]}
                         >
                           <Select
@@ -297,7 +295,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         <Form.Item
                           name={[field.name, 'category2']}
                           rules={[
-                            { required: true, message: 'Select category 2' },
+                            { required: true, message: 'カテゴリー2を選択してください' },
                           ]}
                         >
                           <Select
@@ -319,7 +317,7 @@ const MaterialInput = ({ setActiveTab, number, setNumber }) => {
                         <Form.Item
                           name={[field.name, 'category3']}
                           rules={[
-                            { required: true, message: 'Select category 3' },
+                            { required: true, message: 'カテゴリー3を選択してください' },
                           ]}
                         >
                           <Select
