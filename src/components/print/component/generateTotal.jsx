@@ -151,7 +151,7 @@ const generateTotal = async ({net, setIsGenerating, number, name, exp, imp, crea
             10: { cellWidth: 20 }
           },
           theme: "plain",
-          margin: { left: 10, right: 10 },
+          margin: { left: 20, right: 10 },
           didDrawCell: (data) => {
             const doc = data.doc;
             const cell = data.cell;

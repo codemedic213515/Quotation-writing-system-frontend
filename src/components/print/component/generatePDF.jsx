@@ -131,7 +131,7 @@ const generatePDF = async ({net, setIsGenerating, number, name, exp, imp, create
             6: { cellWidth: 25 },
           },
           theme: "plain",
-          margin: { left: 10, right: 10 },
+          margin: { left: 20, right: 10 },
           didDrawCell: (data) => {
             const doc = data.doc;
             const cell = data.cell;

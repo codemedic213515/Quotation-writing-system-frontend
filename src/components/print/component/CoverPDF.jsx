@@ -7,7 +7,7 @@ const CoverPDF = ({ data }) => {
   const aa = () =>{generateCoverPDF({data, setIsGenerating})}
   return (
     <div className="text-center"> 
-        <p className="mb-10">内訳明細集計表(見積側)</p>
+       
         <Button onClick={aa} disabled={isGenerating} className="w-48 h-12 text-xl">
           {isGenerating ? "PDFを生成中..." : "PDFを生成"}
         </Button>

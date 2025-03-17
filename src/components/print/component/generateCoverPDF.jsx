@@ -61,9 +61,9 @@ const generateCoverPDF = async ({ data, setIsGenerating }) => {
     // 御中 box
     doc.setDrawColor(217, 217, 217)
     doc.setFillColor(255, 255, 255)
-    doc.roundedRect(margin + 30, margin + 30, 20, 10, 1, 1, "FD")
+    doc.roundedRect(margin + 65, margin +28, 20, 10, 1, 1, "FD")
     doc.setFontSize(12)
-    doc.text(data.greeting , margin + 40, margin + 37, { align: "center" })
+    doc.text(data.greeting , margin + 75, margin + 35, { align: "center" })
 
     // **Total Amount Box**
     // Black background for label
@@ -126,7 +126,7 @@ doc.setFont("NotoSansJP", "normal");
     // Payment method box
     doc.setDrawColor(217, 217, 217)
     doc.setFillColor(255, 255, 255)
-    doc.text(data.method , margin + 40, paymentY, { align: "center" })
+    doc.text(data.method +"    "+data.other, margin + 40, paymentY)
     doc.line(margin, paymentY + 2, margin + leftColWidth - 10, paymentY + 2)
 
     // Notes
